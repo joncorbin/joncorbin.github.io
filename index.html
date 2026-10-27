@@ -4,16 +4,28 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Jon Corbin</title>
-  <meta name="description" content="Jon Corbin: Brown CS student and Interim Head of IT at Maven AGI.">
+  <meta name="description" content="Jon Corbin: Brown CS student and IT Engineer at Maven AGI, looking for a software engineering internship for summer 2027.">
+  <meta name="theme-color" content="#efe7d4">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' rx='3' fill='%23e3d8bf'/><rect x='2' y='2' width='12' height='9' rx='1.5' fill='%23071007'/><rect x='4' y='4' width='3' height='1' fill='%237cff6b'/><rect x='4' y='6' width='6' height='1' fill='%237cff6b'/><rect x='2' y='12.5' width='12' height='1' fill='%23e2702a'/></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=Silkscreen:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    // Pick the room lighting before first paint: saved choice, else the OS setting.
+    (function () {
+      var room = null;
+      try { room = localStorage.getItem("room"); } catch (e) {}
+      if (!room) room = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      document.documentElement.dataset.room = room;
+    })();
+  </script>
   <style>
-    /* ---------- Plastics & phosphor ---------- */
+    /* ================= Tokens: plastics, desk, phosphor ================= */
     :root {
       --desk: #efe7d4;
       --desk-dot: #e2d7bf;
+      --on-desk: #2a231b;
+      --on-desk-soft: #5b4e3d;
       --case: #e3d8bf;
       --case-light: #f1e9d6;
       --case-dark: #c7b996;
@@ -22,54 +34,87 @@
       --ink-soft: #5b4e3d;
       --brown: #6b4a2b;
       --orange: #e2702a;
+      --orange-text: #9a4512;
+      --accent-large: #c45a1c;
       --yellow: #e8b23a;
       --red: #c4442b;
       --teal: #2f7f78;
+      --focus: #1f6fd1;
       --crt: #071007;
       --phos: #7cff6b;
-      --phos-dim: #3a9a33;
+      --phos-dim: #43a83b;
       --phos-glow: rgba(124, 255, 107, 0.55);
+      --phos-faint: rgba(124, 255, 107, 0.08);
       --radius: 18px;
       color-scheme: light;
     }
-    :root[data-phosphor="amber"] { --phos: #ffb636; --phos-dim: #a8701a; --phos-glow: rgba(255, 182, 54, 0.55); }
-    :root[data-phosphor="white"] { --phos: #e8f0ff; --phos-dim: #8a93a8; --phos-glow: rgba(232, 240, 255, 0.5); }
+    :root[data-room="dark"] {
+      --desk: #15110c;
+      --desk-dot: #231c14;
+      --on-desk: #ece2cc;
+      --on-desk-soft: #b8aa8e;
+      --case: #d2c6aa;
+      --case-light: #e2d8c0;
+      --case-dark: #b0a387;
+      --case-shadow: #6e634e;
+      --ink-soft: #4a3f31;
+      --orange-text: #f0894a;
+      --accent-large: #f08a47;
+      --focus: #6fb3ff;
+      color-scheme: dark;
+    }
+    :root[data-phosphor="amber"] { --phos: #ffb636; --phos-dim: #b97d1d; --phos-glow: rgba(255, 182, 54, 0.55); --phos-faint: rgba(255, 182, 54, 0.08); }
+    :root[data-phosphor="white"] { --phos: #e8f0ff; --phos-dim: #97a0b5; --phos-glow: rgba(232, 240, 255, 0.5); --phos-faint: rgba(232, 240, 255, 0.07); }
 
+    /* ================= Base ================= */
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; scroll-padding-top: 72px; }
     body {
       margin: 0;
-      background:
-        radial-gradient(var(--desk-dot) 1px, transparent 1.5px) 0 0 / 22px 22px,
-        var(--desk);
-      color: var(--ink);
+      background: radial-gradient(var(--desk-dot) 1px, transparent 1.5px) 0 0 / 22px 22px, var(--desk);
+      color: var(--on-desk);
       font-family: "IBM Plex Mono", ui-monospace, monospace;
       font-size: 15px;
       line-height: 1.6;
       overflow-x: hidden;
+      transition: background-color 0.5s, color 0.5s;
     }
-    a { color: var(--brown); }
-    .wrap { max-width: 1140px; margin: 0 auto; padding: 0 24px; }
-    .pixel { font-family: "Silkscreen", monospace; }
-    .vt { font-family: "VT323", monospace; }
-    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    /* Film grain over everything, for a plastic/printed texture */
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      pointer-events: none;
+      opacity: 0.07;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      mix-blend-mode: multiply;
+    }
+    :root[data-room="dark"] body::after { mix-blend-mode: screen; opacity: 0.05; }
+    a { color: inherit; }
+    :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 6px; }
+    .wrap { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+    .sr-only { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .skip { position: absolute; left: 16px; top: -60px; z-index: 200; padding: 10px 14px; background: var(--ink); color: var(--case-light); border-radius: 8px; text-decoration: none; }
+    .skip:focus { top: 12px; }
 
-    /* Four-stripe trim, like the badge on a 70s machine */
     .stripes { display: grid; grid-template-rows: repeat(4, 5px); }
     .stripes i:nth-child(1) { background: var(--yellow); }
     .stripes i:nth-child(2) { background: var(--orange); }
     .stripes i:nth-child(3) { background: var(--red); }
     .stripes i:nth-child(4) { background: var(--brown); }
 
-    /* ---------- Plastic surfaces ---------- */
+    /* ================= Plastic surfaces & keycaps ================= */
     .plastic {
+      color: var(--ink);
       background: linear-gradient(180deg, var(--case-light), var(--case) 40%);
       border-radius: var(--radius);
       box-shadow:
-        inset 0 2px 0 rgba(255, 255, 255, 0.7),
+        inset 0 2px 0 rgba(255, 255, 255, 0.6),
         inset 0 -5px 0 var(--case-dark),
         0 1px 0 var(--case-shadow),
-        0 18px 30px -18px rgba(70, 50, 20, 0.45);
+        0 22px 40px -22px rgba(40, 25, 5, 0.55);
+      transition: background 0.5s;
     }
     .key {
       display: inline-flex;
@@ -88,34 +133,67 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.8),
         inset 0 -4px 0 var(--case-dark),
         0 2px 0 var(--case-shadow),
-        0 4px 8px -4px rgba(70, 50, 20, 0.5);
-      transition: transform 0.06s, box-shadow 0.06s;
+        0 4px 8px -4px rgba(40, 25, 5, 0.5);
+      transition: transform 0.06s, box-shadow 0.06s, filter 0.15s;
     }
-    .key:hover { color: var(--ink); filter: brightness(1.03); }
+    .key:hover { filter: brightness(1.04); }
     .key:active, .key.pressed {
       transform: translateY(2px);
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), inset 0 -2px 0 var(--case-dark), 0 0 0 var(--case-shadow);
     }
-    .key.orange { background: linear-gradient(180deg, #f08a47, var(--orange)); color: #2a1406; box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), inset 0 -4px 0 #b4541a, 0 2px 0 #8a3e12, 0 4px 8px -4px rgba(70,50,20,0.5); }
-    .key.dark { background: linear-gradient(180deg, #7a583a, var(--brown)); color: var(--case-light); box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -4px 0 #4a3119, 0 2px 0 #33210f, 0 4px 8px -4px rgba(70,50,20,0.5); }
+    .key.orange { background: linear-gradient(180deg, #f08a47, var(--orange)); color: #2a1406; box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), inset 0 -4px 0 #b4541a, 0 2px 0 #8a3e12, 0 4px 8px -4px rgba(40,25,5,0.5); }
+    .key.dark { background: linear-gradient(180deg, #7a583a, var(--brown)); color: #f1e9d6; box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -4px 0 #4a3119, 0 2px 0 #33210f, 0 4px 8px -4px rgba(40,25,5,0.5); }
+    .key.icon { padding: 7px 9px 10px; }
+    .key[aria-pressed="true"] { background: linear-gradient(180deg, #7a583a, var(--brown)); color: #f1e9d6; box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -2px 0 #4a3119, 0 1px 0 #33210f; transform: translateY(1px); }
+    .key svg { display: block; }
 
-    /* ---------- Header ---------- */
-    .topbar { position: sticky; top: 0; z-index: 20; padding: 12px 0; background: color-mix(in srgb, var(--desk) 88%, transparent); backdrop-filter: blur(6px); }
-    .topbar .wrap { display: flex; align-items: center; gap: 16px; }
-    .badge { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
+    /* ================= Header ================= */
+    .topbar { position: sticky; top: 0; z-index: 30; padding: 12px 0; background: color-mix(in srgb, var(--desk) 86%, transparent); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: background-color 0.5s; }
+    .topbar .wrap { display: flex; align-items: center; gap: 14px; }
+    .badge { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--on-desk); }
     .badge .stripes { width: 26px; border-radius: 3px; overflow: hidden; }
     .badge b { font: 700 15px "Silkscreen", monospace; letter-spacing: 0.04em; }
-    .topbar nav { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+    .topbar nav { margin-left: auto; }
+    .topbar nav ul { display: flex; gap: 8px; list-style: none; margin: 0; padding: 0; }
     .topbar nav .key { padding: 5px 10px 8px; font-size: 12px; }
+    .toggles { display: flex; gap: 8px; }
 
-    /* ---------- Hero ---------- */
-    .hero { display: grid; grid-template-columns: 1.25fr 1fr; gap: 48px; align-items: center; padding-top: 40px; padding-bottom: 72px; }
-    .monitor { padding: 26px 26px 18px; position: relative; }
+
+    /* ================= Hero ================= */
+    .hero { display: grid; grid-template-columns: 1fr 1.2fr; gap: 56px; align-items: center; padding-top: 48px; padding-bottom: 64px; }
+    .intro .eyebrow { font: 400 13px "Silkscreen", monospace; color: var(--orange-text); letter-spacing: 0.08em; margin: 0 0 10px; }
+    .intro h1 { font: 400 clamp(64px, 9vw, 108px) / 0.86 "VT323", monospace; margin: 0 0 20px; letter-spacing: 0.01em; color: var(--on-desk); }
+    .intro h1 span { color: var(--accent-large); display: inline-block; }
+    .intro p { font-size: 16px; color: var(--on-desk-soft); margin: 0 0 14px; max-width: 470px; }
+    .intro p strong { color: var(--on-desk); font-weight: 600; }
+    .seeking {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin: 6px 0 24px;
+      padding: 7px 12px;
+      border-radius: 8px;
+      border: 2px dashed var(--orange-text);
+      color: var(--on-desk);
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .seeking .dot { width: 9px; height: 9px; border-radius: 50%; background: #2fbf5b; box-shadow: 0 0 0 0 rgba(47, 191, 91, 0.6); animation: ping 2s infinite; flex: none; }
+    @keyframes ping { 70% { box-shadow: 0 0 0 9px rgba(47, 191, 91, 0); } 100% { box-shadow: 0 0 0 0 rgba(47, 191, 91, 0); } }
+    .intro .keys { display: flex; flex-wrap: wrap; gap: 10px; }
+
+    .rig { perspective: 1400px; }
+    .monitor {
+      padding: 24px 24px 16px;
+      transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+      transform-style: preserve-3d;
+      transition: transform 0.25s ease-out;
+    }
     .screen {
       position: relative;
-      height: 380px;
+      height: 400px;
       border-radius: 22px / 26px;
-      background: radial-gradient(ellipse at 50% 45%, #0f220e 0%, var(--crt) 75%);
+      background: radial-gradient(ellipse at 50% 45%, #10240f 0%, var(--crt) 75%);
       box-shadow: inset 0 0 0 4px #221d15, inset 0 0 50px rgba(0, 0, 0, 0.9), 0 0 0 10px #cfc2a4, 0 0 0 11px var(--case-shadow);
       color: var(--phos);
       font-family: "VT323", monospace;
@@ -125,6 +203,7 @@
       overflow: hidden;
       cursor: text;
     }
+    :root[data-room="dark"] .screen { box-shadow: inset 0 0 0 4px #221d15, inset 0 0 50px rgba(0, 0, 0, 0.9), 0 0 0 10px #a99d84, 0 0 0 11px var(--case-shadow), 0 0 90px 10px var(--phos-faint); }
     .screen::after {
       content: "";
       position: absolute;
@@ -133,15 +212,24 @@
       border-radius: inherit;
       background:
         repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.28) 0 1px, transparent 1px 3px),
-        radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.07), transparent 45%);
+        radial-gradient(ellipse at 30% 18%, rgba(255, 255, 255, 0.08), transparent 45%);
       animation: flicker 6s infinite steps(1);
     }
-    @keyframes flicker { 0%, 100% { opacity: 1; } 47% { opacity: 0.92; } 48% { opacity: 1; } 83% { opacity: 0.95; } }
+    @keyframes flicker { 0%, 100% { opacity: 1; } 47% { opacity: 0.9; } 48% { opacity: 1; } 83% { opacity: 0.95; } }
     .term { position: absolute; inset: 0; padding: 18px 22px; overflow-y: auto; scrollbar-width: none; }
     .term::-webkit-scrollbar { display: none; }
+    .term.power-on { animation: power 0.9s cubic-bezier(.2,.8,.2,1) both; }
+    @keyframes power {
+      0% { transform: scale(0.5, 0.004); filter: brightness(4); opacity: 0.4; }
+      35% { transform: scale(1, 0.004); filter: brightness(4); opacity: 1; }
+      70% { transform: scale(1, 1); filter: brightness(1.8); }
+      100% { transform: none; filter: none; }
+    }
     .term-line { white-space: pre-wrap; word-break: break-word; min-height: 1.15em; }
     .term-line.dim { color: var(--phos-dim); }
-    .term-line.big { font-size: 46px; line-height: 1; margin: 4px 0 6px; letter-spacing: 0.04em; }
+    .term-line.big { font-size: 48px; line-height: 1; margin: 4px 0 6px; letter-spacing: 0.04em; }
+    .term-line.inv { background: var(--phos); color: var(--crt); text-shadow: none; display: inline-block; padding: 0 6px; }
+    .term pre { margin: 0; font: inherit; white-space: pre; }
     .term a { color: var(--phos); }
     .term-input { display: flex; gap: 6px; }
     .term-input input {
@@ -157,180 +245,264 @@
       text-transform: uppercase;
       padding: 0;
     }
-    .monitor-chin { display: flex; align-items: center; justify-content: space-between; padding: 18px 6px 0; }
+    .screen:has(input:focus-visible), .screen:focus-visible { outline: none; box-shadow: inset 0 0 0 4px #221d15, inset 0 0 50px rgba(0, 0, 0, 0.9), 0 0 0 10px #cfc2a4, 0 0 0 13px var(--focus); }
+    .monitor-chin { display: flex; align-items: center; justify-content: space-between; padding: 16px 6px 0; }
     .monitor-chin .stripes { width: 46px; border-radius: 3px; overflow: hidden; }
     .monitor-chin .label { font: 700 12px "Silkscreen", monospace; color: var(--ink-soft); letter-spacing: 0.1em; }
     .led { width: 10px; height: 10px; border-radius: 50%; background: var(--phos); box-shadow: 0 0 8px var(--phos-glow); }
     .vents { display: flex; gap: 4px; }
     .vents i { width: 22px; height: 4px; border-radius: 2px; background: var(--case-dark); box-shadow: inset 0 1px 0 var(--case-shadow); }
+    .quick { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; padding-left: 4px; }
+    .quick .key { font-size: 12px; padding: 6px 11px 9px; text-transform: uppercase; }
+    .quick-label { width: 100%; font: 400 11px "Silkscreen", monospace; color: var(--on-desk-soft); letter-spacing: 0.08em; margin: 0; }
+    .game-status { color: var(--phos-dim); }
 
-    .intro .eyebrow { font: 400 13px "Silkscreen", monospace; color: var(--orange); letter-spacing: 0.08em; margin: 0 0 8px; }
-    .intro h1 { font: 400 clamp(56px, 8vw, 92px) / 0.9 "VT323", monospace; margin: 0 0 18px; letter-spacing: 0.01em; }
-    .intro h1 span { color: var(--orange); }
-    .intro p { font-size: 16px; color: var(--ink-soft); margin: 0 0 22px; max-width: 460px; }
-    .intro p strong { color: var(--ink); }
-    .intro .keys { display: flex; flex-wrap: wrap; gap: 10px; }
-    .intro .hint { margin-top: 22px; font-size: 13px; color: var(--ink-soft); }
-    .intro .hint code { background: var(--case); padding: 1px 6px; border-radius: 4px; }
-
-    /* ---------- Sections ---------- */
+    /* ================= Section heads & reveal ================= */
     section.block { padding: 72px 0; }
     .block-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
-    .block-head h2 { font: 400 48px/1 "VT323", monospace; margin: 0; }
-    .block-head .num { font: 700 13px "Silkscreen", monospace; color: var(--case-light); background: var(--brown); padding: 3px 8px 4px; border-radius: 5px; }
-    .block-head p { margin: 0; color: var(--ink-soft); font-size: 14px; }
+    .block-head h2 { font: 400 50px/1 "VT323", monospace; margin: 0; color: var(--on-desk); }
+    .block-head h2::after { content: "_"; color: var(--accent-large); animation: blink 1.1s steps(1) infinite; margin-left: 2px; }
+    .block-head .num { font: 700 13px "Silkscreen", monospace; color: #f1e9d6; background: var(--brown); padding: 3px 8px 4px; border-radius: 5px; }
+    .block-head p { margin: 0; color: var(--on-desk-soft); font-size: 14px; }
+    @keyframes blink { 50% { opacity: 0; } }
 
-    /* ---------- Character sheet ---------- */
-    .sheet { display: grid; grid-template-columns: 220px 1fr 1fr; gap: 0; padding: 0; overflow: hidden; }
-    .sheet > div { padding: 26px; }
-    .sheet > div + div { border-left: 2px dashed var(--case-dark); }
-    .portrait { display: flex; flex-direction: column; align-items: center; gap: 14px; background: var(--ink); color: var(--case-light); }
-    .sprite { width: 128px; height: 128px; display: grid; grid-template-columns: repeat(16, 1fr); image-rendering: pixelated; }
-    .sprite i { display: block; }
+    .js [data-reveal] { opacity: 0; transform: translateY(26px); transition: opacity 0.7s ease, transform 0.7s cubic-bezier(.2,.8,.2,1); transition-delay: var(--d, 0s); }
+    .js [data-reveal].in { opacity: 1; transform: none; }
+
+    /* ================= High scores ================= */
+    .arcade {
+      background: radial-gradient(ellipse at 50% 0%, #1a1530, #0b0a14 70%);
+      color: #f4f0ff;
+      border-radius: var(--radius);
+      padding: 30px clamp(18px, 4vw, 40px) 26px;
+      box-shadow: inset 0 0 0 4px #2a2440, inset 0 0 60px rgba(0, 0, 0, 0.8), 0 0 0 10px var(--case), 0 0 0 11px var(--case-shadow), 0 26px 40px -24px rgba(40, 25, 5, 0.6);
+      position: relative;
+      overflow: hidden;
+    }
+    .arcade::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(to bottom, rgba(0,0,0,0.22) 0 1px, transparent 1px 3px); }
+    .arcade-title { text-align: center; font: 400 44px/1 "VT323", monospace; margin: 0 0 4px; color: #ffe066; text-shadow: 0 0 10px rgba(255, 224, 102, 0.6), 3px 3px 0 #ff3d7f; letter-spacing: 0.08em; }
+    .arcade-sub { text-align: center; font: 400 11px "Silkscreen", monospace; color: #a99de0; letter-spacing: 0.12em; margin: 0 0 22px; }
+    .scores { list-style: none; margin: 0; padding: 0; }
+    .score {
+      display: grid;
+      grid-template-columns: 64px minmax(110px, 170px) 48px 1fr;
+      gap: 18px;
+      align-items: baseline;
+      padding: 12px 0;
+      border-top: 1px dashed #3a3360;
+      font-family: "VT323", monospace;
+    }
+    .score .rank { font-size: 26px; color: var(--c); text-shadow: 0 0 8px var(--c); }
+    .score .pts { font-size: 40px; line-height: 1; color: var(--c); text-shadow: 0 0 10px var(--c); font-variant-numeric: tabular-nums; }
+    .score .who { font-size: 24px; color: #cfc8ff; }
+    .score .what { font-family: "IBM Plex Mono", monospace; font-size: 14px; color: #ddd8f5; }
+    .score .what strong { display: block; color: #fff; font-weight: 600; font-size: 15px; }
+    .score.top { padding: 18px 0; }
+    .score.top .pts { font-size: 58px; }
+    .score.top .what strong { font-size: 17px; }
+    .press { text-align: center; margin: 18px 0 0; font: 400 22px "VT323", monospace; color: #ffe066; animation: blink 1.2s steps(1) infinite; }
+
+    /* ================= Character sheet ================= */
+    .sheet { overflow: hidden; }
+    .sheet-grid { display: grid; grid-template-columns: 240px 1fr 1.15fr; }
+    .sheet-grid > div { padding: 26px; }
+    .sheet-grid > div + div { border-left: 2px dashed var(--case-dark); }
+    .portrait { display: flex; flex-direction: column; align-items: center; gap: 12px; background: radial-gradient(circle at 50% 35%, #2c3a40, #14100b 70%); color: #f1e9d6; }
+    .ghost-btn { background: none; border: 0; padding: 0; cursor: pointer; width: 180px; height: 180px; border-radius: 50%; }
+    .ghost { width: 100%; height: 100%; overflow: visible; }
+    .ghost .lit { fill: #f6efde; stroke: #1c1813; stroke-width: 1.3; stroke-linejoin: round; }
+    .ghost .shade { fill: #b9ab8d; stroke: #1c1813; stroke-width: 1.3; stroke-linejoin: round; }
+    .ghost .minor .lit { fill: #e3d8bf; }
+    .ghost .minor .shade { fill: #9c8d6b; }
+    .ghost .core { fill: #15120e; stroke: #3b342a; stroke-width: 2; }
+    .ghost .iris { fill: #2aa9e0; }
+    .ghost .pupil { fill: #d9f6ff; }
+    .ghost .glint { fill: #ffffff; }
+    .ghost .eye-glow { fill: #4cc9ff; opacity: 0.35; filter: blur(4px); }
+    .ghost .scan-ring { fill: none; stroke: #6fd7ff; stroke-width: 2; opacity: 0; transform-box: fill-box; transform-origin: center; }
+    .ghost .plate { transition: transform 0.55s cubic-bezier(.2,.9,.3,1.35); }
+    .ghost-btn:hover .plate, .ghost-btn:focus-visible .plate, .ghost.scanning .plate { transform: translateY(-7px); }
+    .ghost-btn:hover .minor .plate, .ghost-btn:focus-visible .minor .plate, .ghost.scanning .minor .plate { transform: translateY(-4px); }
+    .ghost.scanning .scan-ring { animation: ring 1.3s ease-out 2; }
+    @keyframes ring { from { transform: scale(1); opacity: 0.9; } to { transform: scale(3.2); opacity: 0; } }
+    .ghost .bob { animation: bob 4.5s ease-in-out infinite; }
+    .ghost .shell { animation: sway 11s ease-in-out infinite; }
+    @keyframes bob { 50% { transform: translateY(-5px); } }
+    @keyframes sway { 0%, 100% { transform: rotate(-7deg); } 50% { transform: rotate(7deg); } }
+    /* Phosphor version, used inside the terminal */
+    .ghost.phos { width: 150px; height: 150px; margin: 4px 0 8px; filter: drop-shadow(0 0 4px var(--phos-glow)); }
+    .ghost.phos .lit, .ghost.phos .minor .lit { fill: var(--phos-faint); stroke: var(--phos); }
+    .ghost.phos .shade, .ghost.phos .minor .shade { fill: color-mix(in srgb, var(--phos) 30%, transparent); stroke: var(--phos); }
+    .ghost.phos .core { fill: var(--crt); stroke: var(--phos); }
+    .ghost.phos .iris, .ghost.phos .eye-glow { fill: var(--phos); }
+    .ghost.phos .pupil { fill: var(--crt); }
+    .ghost.phos .plate { animation: unfold 1.1s cubic-bezier(.2,.9,.3,1.2) both; }
+    @keyframes unfold { from { transform: translateY(16px); opacity: 0; } }
+
     .light { text-align: center; }
-    .light small { display: block; font: 400 11px "Silkscreen", monospace; letter-spacing: 0.08em; opacity: 0.7; }
-    .light strong { font: 400 44px/1 "VT323", monospace; color: var(--yellow); }
-    .light strong::before { content: "\25C6 "; font-size: 28px; vertical-align: 6px; }
-    .kv { list-style: none; margin: 0; padding: 0; }
-    .kv li { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--case-dark); font-size: 14px; }
-    .kv li:last-child { border-bottom: 0; }
-    .kv span:first-child { font: 400 12px "Silkscreen", monospace; color: var(--ink-soft); letter-spacing: 0.04em; padding-top: 2px; }
-    .kv span:last-child { text-align: right; font-weight: 500; }
+    .light small { display: block; font: 400 11px "Silkscreen", monospace; letter-spacing: 0.08em; color: #cfc6b2; }
+    .light strong { font: 400 46px/1 "VT323", monospace; color: var(--yellow); text-shadow: 0 0 10px rgba(232, 178, 58, 0.5); }
+    .light strong::before { content: "\25C6 "; font-size: 28px; vertical-align: 7px; }
+    .quest-now { text-align: center; font-size: 12px; line-height: 1.4; color: #f1e9d6; border: 1px solid #5d5240; border-radius: 8px; padding: 8px 10px; margin: 0; }
+    .quest-now b { display: block; font: 700 10px "Silkscreen", monospace; color: #7cff6b; letter-spacing: 0.08em; margin-bottom: 2px; }
     .sheet h3 { font: 700 13px "Silkscreen", monospace; margin: 0 0 12px; letter-spacing: 0.06em; color: var(--brown); }
-    .stat { margin-bottom: 12px; }
+    :root[data-room="dark"] .sheet h3 { color: #4a3119; }
+    .kv { margin: 0; }
+    .kv div { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--case-dark); font-size: 14px; }
+    .kv div:last-child { border-bottom: 0; }
+    .kv dt { font: 400 12px "Silkscreen", monospace; color: var(--ink-soft); letter-spacing: 0.04em; padding-top: 2px; }
+    .kv dd { margin: 0; text-align: right; font-weight: 500; }
+    .stat { margin-bottom: 11px; }
     .stat-top { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
     .bar { display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; }
     .bar i { height: 12px; border-radius: 2px; background: var(--case-dark); box-shadow: inset 0 1px 0 rgba(0,0,0,0.08); }
-    .bar i.on { background: var(--orange); box-shadow: inset 0 -2px 0 #b4541a; }
-    .loadout { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 18px; }
-    .slot { background: var(--ink); color: var(--case-light); border-radius: 8px; padding: 8px 10px; }
+    .bar i.on { background: var(--orange); box-shadow: inset 0 -2px 0 #b4541a; transform-origin: left; }
+    .js .sheet:not(.in) .bar i.on { transform: scaleX(0); }
+    .sheet .bar i.on { transition: transform 0.35s cubic-bezier(.2,.9,.3,1.3); transition-delay: calc(var(--n) * 45ms + 300ms); }
+    .loadout { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 16px; }
+    .slot { background: #1c1813; color: #f1e9d6; border-radius: 8px; padding: 8px 10px; }
     .slot small { display: block; font: 400 10px "Silkscreen", monospace; letter-spacing: 0.08em; color: var(--yellow); }
     .slot b { font-weight: 500; font-size: 13px; }
+    .perks { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 2px dashed var(--case-dark); }
+    .perk { padding: 20px 22px; display: grid; grid-template-columns: 40px 1fr; gap: 12px; align-items: start; }
+    .perk + .perk { border-left: 2px dashed var(--case-dark); }
+    .perk-icon { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: #1c1813; color: var(--yellow); box-shadow: 0 0 0 3px var(--case-dark); font: 400 22px "VT323", monospace; }
+    .perk h4 { margin: 0 0 4px; font: 700 12px "Silkscreen", monospace; letter-spacing: 0.04em; }
+    .perk p { margin: 0; font-size: 13px; color: var(--ink-soft); line-height: 1.5; }
 
-    /* ---------- Quest log ---------- */
+    /* ================= Quest log ================= */
     .questlog { padding: 22px; }
     .map-scroll { overflow-x: auto; margin: 0 -6px; padding: 0 6px; }
     .map { display: block; width: 100%; min-width: 640px; height: auto; }
     .map .trail { fill: none; stroke: var(--brown); stroke-width: 4; stroke-dasharray: 2 12; stroke-linecap: round; }
-    .map .trail-done { fill: none; stroke: var(--orange); stroke-width: 6; stroke-linecap: round; }
+    .map .trail-done { fill: none; stroke: var(--orange); stroke-width: 6; stroke-linecap: round; stroke-dasharray: 1200; stroke-dashoffset: 1200; transition: stroke-dashoffset 2s cubic-bezier(.4,0,.2,1) 0.3s; }
+    .questlog.in .trail-done { stroke-dashoffset: 0; }
     .node { cursor: pointer; }
-    .node rect.gem { fill: var(--case-light); stroke: var(--ink); stroke-width: 3; transition: fill 0.15s; }
+    .node rect.gem { fill: var(--case-light); stroke: #2a231b; stroke-width: 3; transition: fill 0.15s; }
     .node.done rect.gem { fill: var(--orange); }
     .node.active rect.gem { fill: var(--yellow); }
     .node.locked rect.gem { fill: var(--case-dark); stroke-dasharray: 4 4; }
-    .node.selected rect.ring { stroke: var(--ink); stroke-width: 2; fill: none; opacity: 1; }
-    .node rect.ring { opacity: 0; }
-    .node:hover rect.gem, .node:focus-visible rect.gem { filter: brightness(1.08); }
-    .node text { font: 700 15px "Silkscreen", monospace; fill: var(--ink); }
+    .node rect.ring { fill: none; stroke: #2a231b; stroke-width: 2; opacity: 0; }
+    .node[aria-pressed="true"] rect.ring { opacity: 1; }
+    .node rect.halo { fill: none; stroke: var(--yellow); stroke-width: 3; transform-box: fill-box; transform-origin: center; animation: halo 2s ease-out infinite; }
+    @keyframes halo { from { transform: rotate(45deg) scale(1); opacity: 0.9; } to { transform: rotate(45deg) scale(2); opacity: 0; } }
+    .node:hover rect.gem { filter: brightness(1.08); }
+    .node text { font: 700 15px "Silkscreen", monospace; fill: #2a231b; }
     .node text.sub { font: 400 13px "IBM Plex Mono", monospace; fill: var(--ink-soft); }
     .node:focus { outline: none; }
-    .node:focus-visible rect.ring { opacity: 1; stroke: var(--teal); stroke-width: 3; fill: none; }
-    .quest { display: grid; grid-template-columns: 1.3fr 1fr; gap: 20px; margin-top: 10px; background: var(--ink); color: var(--case-light); border-radius: 12px; padding: 22px; }
-    .quest .status { display: inline-block; font: 700 11px "Silkscreen", monospace; letter-spacing: 0.08em; padding: 3px 8px; border-radius: 4px; background: var(--orange); color: var(--ink); }
+    .node:focus-visible rect.ring { opacity: 1; stroke: var(--focus); stroke-width: 3; }
+    .quest { display: grid; grid-template-columns: 1.3fr 1fr; gap: 20px; margin-top: 10px; background: #1c1813; color: #f1e9d6; border-radius: 12px; padding: 22px; }
+    .quest .status { display: inline-block; font: 700 11px "Silkscreen", monospace; letter-spacing: 0.08em; padding: 3px 8px; border-radius: 4px; background: var(--orange); color: #1c1813; }
     .quest .status.active { background: var(--yellow); }
-    .quest .status.locked { background: var(--case-shadow); }
-    .quest h3 { font: 400 36px/1 "VT323", monospace; margin: 10px 0 2px; color: #fff6e3; }
-    .quest .where { font-size: 13px; color: var(--case-dark); margin: 0 0 14px; }
+    .quest .status.locked { background: #9c8d6b; }
+    .quest h3 { font: 400 38px/1 "VT323", monospace; margin: 10px 0 2px; color: #fff6e3; }
+    .quest .where { font-size: 13px; color: #cbbd9b; margin: 0 0 14px; }
     .quest h4 { font: 700 11px "Silkscreen", monospace; letter-spacing: 0.1em; color: var(--yellow); margin: 0 0 8px; }
     .quest ul { list-style: none; margin: 0; padding: 0; font-size: 14px; }
-    .quest li { padding-left: 26px; position: relative; margin-bottom: 7px; }
-    .quest .obj li::before { content: "[x]"; position: absolute; left: 0; color: var(--orange); }
+    .quest li { padding-left: 28px; position: relative; margin-bottom: 7px; }
+    .quest .obj li::before { content: "[x]"; position: absolute; left: 0; color: #f08a47; }
     .quest.is-active .obj li::before { content: "[>]"; color: var(--yellow); }
-    .quest.is-locked .obj li::before { content: "[ ]"; color: var(--case-shadow); }
-    .quest .rew li::before { content: "+"; position: absolute; left: 6px; color: var(--yellow); font-weight: 600; }
+    .quest.is-locked .obj li::before { content: "[ ]"; color: #9c8d6b; }
+    .quest .rew li::before { content: "+"; position: absolute; left: 8px; color: var(--yellow); font-weight: 600; }
     .progress { height: 10px; border-radius: 3px; background: #463a2c; margin: 0 0 16px; overflow: hidden; }
     .progress i { display: block; height: 100%; background: var(--orange); }
     .progress.ongoing i { width: 100%; background: repeating-linear-gradient(-45deg, var(--yellow) 0 10px, #c99520 10px 20px); background-size: 28px 28px; animation: march 1s linear infinite; }
     @keyframes march { to { background-position: 28px 0; } }
 
-    /* ---------- Disk drive ---------- */
-    .drive-wrap { display: grid; grid-template-columns: 1fr 1.4fr; gap: 28px; align-items: start; }
-    .disks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-    .disk {
+    /* ================= Project case files ================= */
+    .cases { display: grid; gap: 28px; }
+    .case { overflow: hidden; }
+    .titlebar { display: flex; align-items: center; gap: 14px; padding: 10px 16px; border-bottom: 2px solid var(--case-dark); }
+    .titlebar .rule { flex: 1; height: 12px; background: repeating-linear-gradient(to bottom, var(--case-shadow) 0 2px, transparent 2px 4px); opacity: 0.6; }
+    .titlebar .close { width: 14px; height: 14px; border: 2px solid var(--ink); border-radius: 2px; flex: none; }
+    .titlebar h3 { margin: 0; font: 400 30px/1 "VT323", monospace; white-space: nowrap; }
+    .titlebar .tag { font: 400 11px "Silkscreen", monospace; letter-spacing: 0.06em; white-space: nowrap; background: var(--ink); color: var(--case-light); padding: 3px 8px 4px; border-radius: 4px; }
+    .case-body { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 28px; padding: 24px; align-items: start; }
+    .pitch { font: 400 27px/1.15 "VT323", monospace; margin: 0 0 18px; }
+    .facts { margin: 0 0 18px; }
+    .facts dt { font: 700 11px "Silkscreen", monospace; letter-spacing: 0.08em; color: var(--orange-text); margin: 14px 0 6px; }
+    :root[data-room="dark"] .facts dt { color: #7a3510; }
+    .facts dd { margin: 0; font-size: 14px; color: var(--ink-soft); }
+    .facts ul { margin: 0; padding-left: 18px; }
+    .facts li + li { margin-top: 4px; }
+    .facts strong { color: var(--ink); }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 0 0 16px; padding: 0; }
+    .chips li { font-size: 12px; font-weight: 500; padding: 3px 10px; border-radius: 999px; background: var(--ink); color: var(--case-light); }
+    .links { display: flex; flex-wrap: wrap; gap: 10px; }
+    .note { font-size: 13px; color: var(--ink-soft); margin: 0; }
+
+    .flow {
+      margin: 0;
+      padding: 18px;
+      border-radius: 14px;
+      background: radial-gradient(ellipse at 50% 30%, #0f200e, var(--crt) 80%);
+      color: var(--phos);
+      font-family: "VT323", monospace;
+      text-shadow: 0 0 4px var(--phos-glow);
+      box-shadow: inset 0 0 0 3px #221d15, inset 0 0 30px rgba(0, 0, 0, 0.85), 0 0 0 6px #cfc2a4, 0 0 0 7px var(--case-shadow);
       position: relative;
-      aspect-ratio: 1 / 1.04;
-      border: 0;
-      border-radius: 6px 6px 6px 6px;
-      padding: 0;
-      cursor: pointer;
-      box-shadow: inset 0 -4px 0 rgba(0,0,0,0.25), 0 6px 12px -6px rgba(40,25,10,0.6);
-      transition: transform 0.25s cubic-bezier(.2,.9,.3,1.3), opacity 0.2s;
-      font-family: "IBM Plex Mono", monospace;
     }
-    .disk:hover { transform: translateY(-6px) rotate(-2deg); }
-    .disk.inserted { transform: translateY(-14px) scale(0.92); opacity: 0.45; }
-    .disk::before { /* metal shutter */
+    .flow::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; background: repeating-linear-gradient(to bottom, rgba(0,0,0,0.25) 0 1px, transparent 1px 3px); }
+    .flow figcaption { font: 400 11px "Silkscreen", monospace; color: var(--phos-dim); letter-spacing: 0.1em; margin-bottom: 12px; text-shadow: none; }
+    .pipeline { list-style: none; margin: 0; padding: 0; }
+    .stage, .stage.split > div {
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 10px;
+      align-items: center;
+      padding: 7px 10px;
+      border: 1px solid var(--phos-dim);
+      border-radius: 6px;
+      background: var(--phos-faint);
+      animation: pulse 4s ease-in-out infinite;
+      animation-delay: calc(var(--i) * 0.55s);
+    }
+    .stage { position: relative; }
+    .stage + .stage { margin-top: 26px; }
+    .stage + .stage::before { content: ""; position: absolute; left: 50%; top: -27px; width: 2px; height: 26px; background: var(--phos-dim); }
+    .stage + .stage::after {
       content: "";
       position: absolute;
-      top: 0;
-      left: 26%;
-      width: 48%;
-      height: 30%;
-      background: linear-gradient(90deg, #b9bcc0, #e6e8ea 40%, #a7abb0);
-      border-radius: 0 0 3px 3px;
-      box-shadow: inset 0 -2px 0 rgba(0,0,0,0.2);
+      left: calc(50% - 3px);
+      top: -27px;
+      width: 8px;
+      height: 8px;
+      background: var(--phos);
+      box-shadow: 0 0 8px var(--phos);
+      animation: packet 1.4s linear infinite;
+      animation-delay: calc(var(--i) * 0.3s);
     }
-    .disk::after { /* shutter window */
-      content: "";
-      position: absolute;
-      top: 5%;
-      left: 54%;
-      width: 10%;
-      height: 19%;
-      background: #3a3a3a;
-      border-radius: 2px;
-    }
-    .disk .label {
-      position: absolute;
-      left: 10%;
-      right: 10%;
-      bottom: 8%;
-      height: 50%;
-      background: #fbf7ec;
-      border-radius: 3px;
-      padding: 8px;
-      text-align: left;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08);
-      background-image: repeating-linear-gradient(to bottom, transparent 0 15px, #d9e2ef 15px 16px);
-      background-position: 0 22px;
-    }
-    .disk .label b { font: 400 20px/1 "VT323", monospace; color: #1d2a6b; }
-    .disk .label small { font: 400 10px "Silkscreen", monospace; color: var(--red); }
-    .disk.c1 { background: #2b2b2e; }
-    .disk.c2 { background: var(--teal); }
-    .disk.c3 { background: var(--red); }
+    @keyframes packet { 0% { transform: translateY(0); opacity: 0; } 15%, 80% { opacity: 1; } 100% { transform: translateY(18px); opacity: 0; } }
+    @keyframes pulse { 0%, 30%, 100% { background: var(--phos-faint); box-shadow: none; } 12% { background: color-mix(in srgb, var(--phos) 20%, transparent); box-shadow: 0 0 14px var(--phos-glow); } }
+    .stage .ico { font-size: 15px; text-align: center; border: 1px solid var(--phos-dim); border-radius: 4px; padding: 1px 0; color: var(--phos); }
+    .stage b { display: block; font-weight: 400; font-size: 22px; line-height: 1.05; }
+    .stage small { display: block; font-size: 17px; line-height: 1.1; color: var(--phos-dim); }
+    .stage.split { grid-template-columns: 1fr 1fr; padding: 0; border: 0; background: none; animation: none; }
 
-    .drive { padding: 18px; }
-    .drive-slot { height: 18px; border-radius: 4px; background: #2a231b; box-shadow: inset 0 3px 4px rgba(0,0,0,0.6); margin: 0 30px 14px; position: relative; }
-    .drive-slot::after { content: ""; position: absolute; right: -24px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #5a1d10; transition: background 0.1s, box-shadow 0.1s; }
-    .drive.busy .drive-slot::after { background: #ff4a2a; box-shadow: 0 0 8px #ff4a2a; }
-    .drive .screen { height: 360px; font-size: 19px; }
-    .drive .screen pre { margin: 0; font: inherit; white-space: pre; }
-
-    /* ---------- Keycap tray ---------- */
+    /* ================= Keycap tray ================= */
     .tray { padding: 16px; }
     .tray-inner { position: relative; height: 380px; border-radius: 12px; background: linear-gradient(180deg, #d4c7a7, #cbbd9b); box-shadow: inset 0 6px 14px rgba(70,50,20,0.35), inset 0 -2px 0 rgba(255,255,255,0.4); overflow: hidden; }
-    .tray canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: pan-y; }
-    .tray-tip { position: absolute; left: 16px; top: 12px; font: 400 12px "Silkscreen", monospace; color: rgba(42,35,27,0.55); pointer-events: none; }
+    :root[data-room="dark"] .tray-inner { background: linear-gradient(180deg, #c3b593, #b8aa88); }
+    .tray canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: pan-y; cursor: grab; }
+    .tray canvas:active { cursor: grabbing; }
+    .tray-tip { position: absolute; left: 16px; top: 12px; font: 400 12px "Silkscreen", monospace; color: rgba(42,35,27,0.65); pointer-events: none; }
     .tray-bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 14px 4px 2px; }
-    .tray-bar p { margin: 0; font-size: 13px; color: var(--ink-soft); }
-    .tray-bar .keys { display: flex; gap: 8px; }
+    .tray-bar p { margin: 0; font-size: 13px; color: var(--ink-soft); display: flex; align-items: center; gap: 10px; }
+    .tray-bar .keys { display: flex; gap: 8px; flex-wrap: wrap; }
     .rarity { display: inline-flex; gap: 6px; align-items: center; }
     .rarity i { width: 10px; height: 10px; transform: rotate(45deg); display: inline-block; }
 
-    /* ---------- Contact / modem ---------- */
+    /* ================= Contact / modem ================= */
     .modem { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; padding: 28px; }
-    .modem h2 { font: 400 44px/1 "VT323", monospace; margin: 0 0 8px; }
-    .modem p { margin: 0; color: var(--ink-soft); }
+    .modem h2 { font: 400 46px/1 "VT323", monospace; margin: 0 0 8px; }
+    .modem p { margin: 0; color: var(--ink-soft); max-width: 520px; }
+    .modem p strong { color: var(--ink); }
     .modem .lights { display: flex; gap: 14px; margin-top: 18px; font: 400 10px "Silkscreen", monospace; color: var(--ink-soft); }
     .modem .lights span { display: flex; align-items: center; gap: 6px; }
     .modem .lights i { width: 8px; height: 8px; border-radius: 50%; background: #5a1d10; }
     .modem .lights i.on { background: #ff4a2a; box-shadow: 0 0 6px #ff4a2a; }
-    .modem .lights i.blink { animation: blink 0.8s steps(1) infinite; }
-    @keyframes blink { 50% { background: #5a1d10; box-shadow: none; } }
+    .modem .lights i.blink { animation: modemblink 0.8s steps(1) infinite; }
+    @keyframes modemblink { 50% { background: #5a1d10; box-shadow: none; } }
     .modem .dial { display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
     .modem .dial .key { font-size: 14px; padding: 12px 18px 15px; }
     .modem .number {
@@ -344,19 +516,20 @@
       box-shadow: inset 0 0 0 3px #221d15, inset 0 0 18px rgba(0, 0, 0, 0.8);
       user-select: all;
     }
-    .modem .number small { display: block; font: 400 10px "Silkscreen", monospace; color: var(--phos-dim); letter-spacing: 0.1em; }
+    .modem .number small { display: block; font: 400 10px "Silkscreen", monospace; color: var(--phos-dim); letter-spacing: 0.1em; text-shadow: none; }
 
-    footer { padding: 40px 0 60px; font-size: 13px; color: var(--ink-soft); }
+    footer { padding: 40px 0 60px; font-size: 13px; color: var(--on-desk-soft); }
     footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
     footer .stripes { width: 100%; margin-bottom: 22px; border-radius: 3px; overflow: hidden; }
+    footer em { font-style: italic; letter-spacing: 0.04em; }
 
-    /* ---------- Toast ---------- */
+    /* ================= Toast ================= */
     .toast {
       position: fixed;
       right: 20px;
       bottom: 20px;
-      z-index: 50;
-      max-width: 340px;
+      z-index: 60;
+      max-width: 360px;
       padding: 14px 16px;
       border-radius: 10px;
       background: var(--crt);
@@ -366,133 +539,240 @@
       box-shadow: 0 0 0 4px #cfc2a4, 0 12px 30px -10px rgba(0,0,0,0.6);
       transform: translateY(calc(100% + 40px));
       visibility: hidden;
-      transition: transform 0.3s cubic-bezier(.2,.9,.3,1.2), visibility 0s 0.3s;
+      transition: transform 0.35s cubic-bezier(.2,.9,.3,1.2), visibility 0s 0.35s;
     }
-    .toast.show { transform: none; visibility: visible; transition: transform 0.3s cubic-bezier(.2,.9,.3,1.2); }
-    .toast b { display: block; font: 700 11px "Silkscreen", monospace; letter-spacing: 0.08em; margin-bottom: 4px; }
+    .toast.show { transform: none; visibility: visible; transition: transform 0.35s cubic-bezier(.2,.9,.3,1.2); }
+    .toast b { display: block; font: 700 11px "Silkscreen", monospace; letter-spacing: 0.08em; margin-bottom: 4px; text-shadow: none; }
 
-    /* ---------- Responsive ---------- */
-    @media (max-width: 960px) {
-      .hero { grid-template-columns: 1fr; gap: 32px; padding-top: 24px; padding-bottom: 48px; }
-      .intro { order: -1; }
-      .sheet { grid-template-columns: 1fr 1fr; }
-      .sheet .portrait { grid-column: span 2; flex-direction: row; justify-content: center; gap: 28px; }
-      .sheet > div:nth-child(2) { border-left: 0; }
-      .sheet > div + div { border-top: 2px dashed var(--case-dark); }
-      .drive-wrap { grid-template-columns: 1fr; }
-      .quest { grid-template-columns: 1fr; }
+    /* ================= Responsive ================= */
+    @media (max-width: 1020px) {
+      .sheet-grid { grid-template-columns: 1fr 1fr; }
+      .sheet-grid .portrait { grid-column: span 2; flex-direction: row; justify-content: center; flex-wrap: wrap; gap: 24px; }
+      .sheet-grid > div:nth-child(2) { border-left: 0; }
+      .sheet-grid > div + div { border-top: 2px dashed var(--case-dark); }
+      .perks { grid-template-columns: 1fr 1fr; }
+      .perk:nth-child(3) { border-left: 0; }
+      .perk:nth-child(n+3) { border-top: 2px dashed var(--case-dark); }
     }
-    @media (max-width: 640px) {
-      .wrap { padding: 0 16px; }
+    @media (max-width: 960px) {
       .topbar nav { display: none; }
+      .toggles { margin-left: auto; }
+      .hero { grid-template-columns: 1fr; gap: 36px; padding-top: 28px; padding-bottom: 48px; }
+      .case-body { grid-template-columns: minmax(0, 1fr); }
+      .quest { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 680px) {
+      .wrap { padding: 0 16px; }
       .monitor { padding: 14px 14px 12px; }
-      .screen { height: 320px; font-size: 18px; }
+      .screen { height: 360px; font-size: 18px; }
       .term { padding: 14px 16px; }
-      .term-line.big { font-size: 36px; }
-      .sheet { grid-template-columns: 1fr; }
-      .sheet .portrait { grid-column: auto; }
-      .sheet > div + div { border-left: 0; }
-      .disks { gap: 10px; }
-      .disk .label b { font-size: 16px; }
-      .drive .screen { font-size: 14px; height: 340px; }
+      .term-line.big { font-size: 38px; }
+      .sheet-grid { grid-template-columns: 1fr; }
+      .sheet-grid .portrait { grid-column: auto; }
+      .sheet-grid > div + div { border-left: 0; }
+      .perks { grid-template-columns: 1fr; }
+      .perk + .perk { border-left: 0; border-top: 2px dashed var(--case-dark); }
+      .score { grid-template-columns: 48px 1fr; gap: 4px 14px; }
+      .score .who { display: none; }
+      .score .what { grid-column: 2; }
+      .score.top .pts { font-size: 48px; }
+      .titlebar { flex-wrap: wrap; }
+      .titlebar .rule { display: none; }
+      .titlebar h3 { white-space: normal; }
+      .case-body { padding: 18px; }
+      .pitch { font-size: 24px; }
+      .stage.split { grid-template-columns: minmax(0, 1fr); }
+      .flow { padding: 14px; }
       .tray-inner { height: 320px; }
       .modem { grid-template-columns: 1fr; }
       section.block { padding: 52px 0; }
+      .block-head h2 { font-size: 42px; }
     }
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
-      .screen::after, .progress.ongoing i, .modem .lights i.blink { animation: none; }
-      .disk, .key, .toast { transition: none; }
+      *, *::before, *::after { animation: none !important; }
+      .js [data-reveal] { opacity: 1; transform: none; transition: none; }
+      .js .sheet:not(.in) .bar i.on { transform: none; }
+      .map .trail-done { transition: none; stroke-dashoffset: 0; }
+      .monitor, .key, .toast, .ghost .plate { transition: none; }
     }
   </style>
 </head>
 <body>
+  <a class="skip" href="#main">Skip to content</a>
+
   <header class="topbar">
     <div class="wrap">
-      <a href="#top" class="badge" aria-label="Back to top">
+      <a href="#top" class="badge" aria-label="JC two, back to top">
         <span class="stripes" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-        <b>JC ][</b>
+        <b aria-hidden="true">JC ][</b>
       </a>
       <nav aria-label="Main">
-        <a class="key" href="#about">About</a>
-        <a class="key" href="#quests">Quests</a>
-        <a class="key" href="#disks">Projects</a>
-        <a class="key" href="#skills">Skills</a>
-        <a class="key orange" href="#contact">Contact</a>
+        <ul>
+          <li><a class="key" href="#scores">Scores</a></li>
+          <li><a class="key" href="#about">About</a></li>
+          <li><a class="key" href="#quests">Quests</a></li>
+          <li><a class="key" href="#projects">Projects</a></li>
+          <li><a class="key" href="#skills">Skills</a></li>
+          <li><a class="key orange" href="#contact">Contact</a></li>
+        </ul>
       </nav>
+      <div class="toggles">
+        <button class="key icon" id="lights-toggle" aria-pressed="false" aria-label="Lights off">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></svg>
+        </button>
+        <button class="key icon" id="sound-toggle" aria-pressed="false" aria-label="Sound effects">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>
+        </button>
+      </div>
     </div>
   </header>
 
-  <main id="top">
-    <!-- ===== Hero: the computer ===== -->
-    <div class="wrap hero">
-      <div class="monitor plastic">
-        <div class="screen" id="screen" aria-label="Interactive terminal. Click and type help.">
-          <div class="term" id="term">
-            <div id="term-out" aria-live="polite"></div>
-            <label class="term-input" id="term-input-row" hidden>
-              <span aria-hidden="true">]</span>
-              <span class="sr-only">Command</span>
-              <input id="term-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false">
-            </label>
-          </div>
-        </div>
-        <div class="monitor-chin">
-          <span class="stripes" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-          <span class="label">JC ][ PLUS</span>
-          <span class="vents" aria-hidden="true"><i></i><i></i><i></i></span>
-          <span class="led" aria-hidden="true"></span>
-        </div>
-      </div>
-
+  <main id="main" tabindex="-1">
+    <!-- ===== Hero ===== -->
+    <div class="wrap hero" id="top">
       <div class="intro">
         <p class="eyebrow">Player one:</p>
-        <h1>Jon<br><span>Corbin</span></h1>
+        <h1>Jon <span>Corbin</span></h1>
         <p>
-          CS student at <strong>Brown</strong> and <strong>Interim Head of IT</strong> at
-          <strong>Maven AGI</strong>. I automate the unglamorous parts of running a company,
-          and build AI tools and web apps on the side.
+          CS student at <strong>Brown</strong> and <strong>IT Engineer</strong> at <strong>Maven AGI</strong>,
+          where I build the integrations and automation a fast-growing AI startup runs on.
+          On the side: AI agents, full-stack apps, and this computer.
         </p>
+        <p class="seeking"><span class="dot" aria-hidden="true"></span> Looking for a software engineering internship, summer 2027</p>
         <div class="keys">
-          <a class="key orange" href="#disks">Insert a disk</a>
+          <a class="key orange" href="#projects">See what I've built</a>
           <a class="key" href="https://github.com/joncorbin">GitHub</a>
           <a class="key" href="https://www.linkedin.com/in/jonkcorbin/">LinkedIn</a>
         </div>
-        <p class="hint">Psst: click the screen and type <code>help</code>.</p>
+      </div>
+
+      <div class="rig" id="rig">
+        <div class="monitor plastic" id="monitor">
+          <div class="screen" id="screen">
+            <div class="term" id="term">
+              <div id="term-out" role="log" aria-live="polite" aria-label="Terminal output"></div>
+              <div class="term-input" id="term-input-row" hidden>
+                <span aria-hidden="true">]</span>
+                <label for="term-input" class="sr-only">Terminal command. Type help and press Enter.</label>
+                <input id="term-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go">
+              </div>
+            </div>
+          </div>
+          <div class="monitor-chin">
+            <span class="stripes" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+            <span class="label" aria-hidden="true">JC ][ PLUS</span>
+            <span class="vents" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="led" aria-hidden="true"></span>
+          </div>
+        </div>
+        <div class="quick" role="group" aria-labelledby="quick-label">
+          <p class="quick-label" id="quick-label">Try a command:</p>
+          <button class="key" data-cmd="help">Help</button>
+          <button class="key" data-cmd="neofetch">Neofetch</button>
+          <button class="key" data-cmd="hire">Hire</button>
+          <button class="key dark" data-cmd="play">Play Xol</button>
+          <button class="key" data-cmd="ghost">Ghost</button>
+        </div>
       </div>
     </div>
 
-    <!-- ===== Character sheet ===== -->
-    <section class="block" id="about">
+    <!-- ===== High scores ===== -->
+    <section class="block" id="scores" aria-labelledby="scores-title">
       <div class="wrap">
-        <div class="block-head"><span class="num">01</span><h2>Character sheet</h2><p>Stats are self-reported. Results may vary.</p></div>
-        <div class="sheet plastic">
-          <div class="portrait">
-            <div class="sprite" id="sprite" role="img" aria-label="Pixel-art companion"></div>
-            <div class="light" title="Graduation year. It's a stretch.">
-              <small>Light level</small>
-              <strong>2028</strong>
+        <div class="block-head" data-reveal><span class="num" aria-hidden="true">01</span><h2 id="scores-title">High scores</h2><p>Numbers I'm proud of.</p></div>
+        <div class="arcade" data-reveal>
+          <p class="arcade-title" aria-hidden="true">HIGH SCORES</p>
+          <p class="arcade-sub" aria-hidden="true">PLAYER: JC &middot; CREDITS: &infin;</p>
+          <ol class="scores">
+            <li class="score top" style="--c:#ffe066">
+              <span class="rank">1ST</span>
+              <span class="pts" data-count="833" data-prefix="$" data-suffix="K">$833K</span>
+              <span class="who" aria-hidden="true">JC</span>
+              <span class="what"><strong>SaaS savings reported, H2 2026</strong>Co-led Maven AGI's SaaS cost-reduction push as an intern: analyzed spend app by app, worked with each vendor's owner, and followed through until the revised contract terms landed.</span>
+            </li>
+            <li class="score" style="--c:#ff8a4c">
+              <span class="rank">2ND</span>
+              <span class="pts" data-count="1000" data-suffix="+">1,000+</span>
+              <span class="who" aria-hidden="true">JC</span>
+              <span class="what"><strong>Linear issues filed automatically</strong>From customer rollout emails, routed to the right team and project, with no duplicates across runs.</span>
+            </li>
+            <li class="score" style="--c:#6fe3a0">
+              <span class="rank">3RD</span>
+              <span class="pts" data-count="23" data-prefix="−" data-suffix="%">−23%</span>
+              <span class="who" aria-hidden="true">JC</span>
+              <span class="what"><strong>Hardware spend</strong>Cut during my internship at Maven AGI.</span>
+            </li>
+            <li class="score" style="--c:#6fc8ff">
+              <span class="rank">4TH</span>
+              <span class="pts" data-count="10" data-suffix="+">10+</span>
+              <span class="who" aria-hidden="true">JC</span>
+              <span class="what"><strong>Enterprise apps moved to SSO + SCIM</strong>Led the rollout with Okta and Google Workspace.</span>
+            </li>
+            <li class="score" style="--c:#d29bff">
+              <span class="rank">5TH</span>
+              <span class="pts" data-count="74">74</span>
+              <span class="who" aria-hidden="true">JC</span>
+              <span class="what"><strong>Automated tests</strong>On Complaint Resolution AI, a multi-agent side project.</span>
+            </li>
+          </ol>
+          <p class="press" aria-hidden="true">INSERT COIN TO CONTINUE</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Character sheet ===== -->
+    <section class="block" id="about" aria-labelledby="about-title">
+      <div class="wrap">
+        <div class="block-head" data-reveal><span class="num" aria-hidden="true">02</span><h2 id="about-title">Character sheet</h2><p>Stats are self-reported. Results may vary.</p></div>
+        <div class="sheet plastic" data-reveal>
+          <div class="sheet-grid">
+            <div class="portrait">
+              <button class="ghost-btn" id="ghost-btn" aria-label="Ghost companion. Press to scan."></button>
+              <div class="light" title="My graduation year. It's a stretch.">
+                <small>Light level</small>
+                <strong>2028</strong>
+              </div>
+              <p class="quest-now"><b>Current quest</b>SWE internship<br>Summer 2027</p>
+            </div>
+            <div>
+              <h3>Profile</h3>
+              <dl class="kv">
+                <div><dt>Name</dt><dd>Jon Corbin</dd></div>
+                <div><dt>Class</dt><dd>Software Engineer</dd></div>
+                <div><dt>Subclass</dt><dd>Customer Engineer</dd></div>
+                <div><dt>Day job</dt><dd>IT Engineer, Maven AGI</dd></div>
+                <div><dt>Guild</dt><dd>Brown University '28</dd></div>
+                <div><dt>Path</dt><dd>CS + Religious Studies</dd></div>
+                <div><dt>Base</dt><dd>Boston, MA</dd></div>
+              </dl>
+            </div>
+            <div>
+              <h3>Attributes</h3>
+              <div id="stats"></div>
+              <div class="loadout" role="list" aria-label="Loadout">
+                <div class="slot" role="listitem"><small>Kinetic</small><b>Python</b></div>
+                <div class="slot" role="listitem"><small>Energy</small><b>TypeScript</b></div>
+                <div class="slot" role="listitem"><small>Power</small><b>LLM agents</b></div>
+              </div>
             </div>
           </div>
-          <div>
-            <h3>Profile</h3>
-            <ul class="kv">
-              <li><span>Name</span><span>Jon Corbin</span></li>
-              <li><span>Class</span><span>Sysadmin</span></li>
-              <li><span>Subclass</span><span>Builder</span></li>
-              <li><span>Guild</span><span>Brown University '28</span></li>
-              <li><span>Path</span><span>CS + Religious Studies</span></li>
-              <li><span>Base</span><span>Boston, MA</span></li>
-              <li><span>Status</span><span style="color:var(--teal)">Open to internships</span></li>
-            </ul>
-          </div>
-          <div>
-            <h3>Attributes</h3>
-            <div id="stats"></div>
-            <div class="loadout">
-              <div class="slot"><small>Kinetic</small><b>Python</b></div>
-              <div class="slot"><small>Energy</small><b>TypeScript</b></div>
-              <div class="slot"><small>Power</small><b>Okta</b></div>
+          <div class="perks" role="list" aria-label="Perks">
+            <div class="perk" role="listitem">
+              <span class="perk-icon" aria-hidden="true">&#8644;</span>
+              <div><h4>Integrator</h4><p>I wire systems together: Linear, Slack, Google Workspace, Okta, Ticketmaster, LLM APIs.</p></div>
+            </div>
+            <div class="perk" role="listitem">
+              <span class="perk-icon" aria-hidden="true">&#9993;</span>
+              <div><h4>Customer whisperer</h4><p>I turn messy customer requests into tracked, routed, finished work.</p></div>
+            </div>
+            <div class="perk" role="listitem">
+              <span class="perk-icon" aria-hidden="true">&#10003;</span>
+              <div><h4>Ships with tests</h4><p>Typed models end to end and 74 automated tests on my agent pipeline.</p></div>
+            </div>
+            <div class="perk" role="listitem">
+              <span class="perk-icon" aria-hidden="true">$</span>
+              <div><h4>Cost hawk</h4><p>Helped find $833K in SaaS savings by reading every contract nobody else wanted to.</p></div>
             </div>
           </div>
         </div>
@@ -500,14 +780,14 @@
     </section>
 
     <!-- ===== Quest log ===== -->
-    <section class="block" id="quests">
+    <section class="block" id="quests" aria-labelledby="quests-title">
       <div class="wrap">
-        <div class="block-head"><span class="num">02</span><h2>Quest log</h2><p>Pick a stop on the map.</p></div>
-        <div class="questlog plastic">
+        <div class="block-head" data-reveal><span class="num" aria-hidden="true">03</span><h2 id="quests-title">Quest log</h2><p>Pick a stop on the map.</p></div>
+        <div class="questlog plastic" data-reveal>
           <div class="map-scroll">
-            <svg class="map" id="map" viewBox="0 0 1000 230" role="group" aria-label="Career map">
-              <path class="trail" d="M70 170 C 220 170, 230 70, 380 70 S 560 170, 700 160 S 870 70, 930 80"/>
-              <path class="trail-done" id="trail-done" d="M70 170 C 220 170, 230 70, 380 70 S 560 170, 700 160"/>
+            <svg class="map" id="map" viewBox="0 0 1000 240" role="group" aria-label="Career map. Choose a stop to see details.">
+              <path class="trail" d="M70 180 C 220 180, 230 80, 380 80 S 560 180, 700 170 S 870 80, 930 90"/>
+              <path class="trail-done" d="M70 180 C 220 180, 230 80, 380 80 S 560 180, 700 170"/>
             </svg>
           </div>
           <div class="quest" id="quest" aria-live="polite"></div>
@@ -515,44 +795,167 @@
       </div>
     </section>
 
-    <!-- ===== Disk drive ===== -->
-    <section class="block" id="disks">
+    <!-- ===== Projects ===== -->
+    <section class="block" id="projects" aria-labelledby="projects-title">
       <div class="wrap">
-        <div class="block-head"><span class="num">03</span><h2>Software library</h2><p>Click a disk to load it.</p></div>
-        <div class="drive-wrap">
-          <div>
-            <div class="disks" id="disk-list"></div>
-            <p style="font-size:13px;color:var(--ink-soft);margin-top:18px">Each disk shows how the project fits together. Source is on GitHub where it's public.</p>
-          </div>
-          <div class="drive plastic" id="drive">
-            <div class="drive-slot" aria-hidden="true"></div>
-            <div class="screen">
-              <div class="term" id="drive-out" aria-live="polite"></div>
+        <div class="block-head" data-reveal><span class="num" aria-hidden="true">04</span><h2 id="projects-title">Things I've built</h2><p>What each one does, what I built, and how it works.</p></div>
+        <div class="cases">
+
+          <article class="case plastic" aria-labelledby="p1" data-reveal>
+            <div class="titlebar"><span class="close" aria-hidden="true"></span><span class="rule" aria-hidden="true"></span><h3 id="p1">Complaint Resolution AI</h3><span class="rule" aria-hidden="true"></span><span class="tag">AI agents &middot; side project</span></div>
+            <div class="case-body">
+              <div>
+                <p class="pitch">Describe a dispute with a company in plain English. A team of AI agents turns it into a case analysis, a negotiation plan, a ready-to-send complaint and an escalation plan.</p>
+                <dl class="facts">
+                  <dt>Why</dt>
+                  <dd>When a company stonewalls you, it's hard to know what your options are or who to escalate to.</dd>
+                  <dt>What I built</dt>
+                  <dd><ul>
+                    <li>A <strong>typed multi-agent pipeline</strong> in Python, with Pydantic models passed between every step.</li>
+                    <li><strong>FastAPI endpoints</strong> and a <strong>Streamlit demo</strong> anyone can click through.</li>
+                    <li><strong>Deterministic policy retrieval</strong> and an <strong>offline fallback</strong>, so it still works without the LLM.</li>
+                    <li><strong>74 automated tests</strong>.</li>
+                  </ul></dd>
+                </dl>
+                <ul class="chips" aria-label="Tech used"><li>Python</li><li>Pydantic</li><li>FastAPI</li><li>Streamlit</li><li>Anthropic API</li></ul>
+                <div class="links"><a class="key orange" href="https://github.com/joncorbin/cr-ai-project">View source<span class="sr-only"> for Complaint Resolution AI on GitHub</span></a></div>
+              </div>
+              <figure class="flow" aria-labelledby="f1">
+                <figcaption id="f1">How it works</figcaption>
+                <ol class="pipeline">
+                  <li class="stage" style="--i:0"><span class="ico" aria-hidden="true">IN</span><span><b>Your story</b><small>plain-English complaint</small></span></li>
+                  <li class="stage" style="--i:1"><span class="ico" aria-hidden="true">AI</span><span><b>Case analysis</b><small>+ policy retrieval</small></span></li>
+                  <li class="stage" style="--i:2"><span class="ico" aria-hidden="true">AI</span><span><b>Negotiation strategy</b><small>what to ask for, and how</small></span></li>
+                  <li class="stage split" style="--i:3">
+                    <div style="--i:3"><span class="ico" aria-hidden="true">OUT</span><span><b>Complaint draft</b><small>ready to send</small></span></div>
+                    <div style="--i:3"><span class="ico" aria-hidden="true">OUT</span><span><b>Escalation plan</b><small>step by step</small></span></div>
+                  </li>
+                </ol>
+              </figure>
             </div>
-          </div>
+          </article>
+
+          <article class="case plastic" aria-labelledby="p2" data-reveal>
+            <div class="titlebar"><span class="close" aria-hidden="true"></span><span class="rule" aria-hidden="true"></span><h3 id="p2">Rollout &rarr; Linear automation</h3><span class="rule" aria-hidden="true"></span><span class="tag">Integration &middot; at Maven AGI</span></div>
+            <div class="case-body">
+              <div>
+                <p class="pitch">Reads customer rollout emails and files them as Linear issues, routed to the right team and project. It has filed 1,000+ issues so far.</p>
+                <dl class="facts">
+                  <dt>Why</dt>
+                  <dd>Rollout requests arrive by email, but the team tracks work in Linear. Copying them over by hand doesn't scale.</dd>
+                  <dt>What I built</dt>
+                  <dd><ul>
+                    <li>A <strong>Google Apps Script</strong> job that parses incoming rollout emails.</li>
+                    <li><strong>Routing rules</strong> that pick the right Linear team and project for each request.</li>
+                    <li>A <strong>Linear API integration</strong> that creates the issues.</li>
+                    <li>A <strong>persistent processing ledger</strong>, so re-running the job never creates duplicates.</li>
+                  </ul></dd>
+                </dl>
+                <ul class="chips" aria-label="Tech used"><li>Google Apps Script</li><li>Linear API</li><li>Google Workspace</li></ul>
+                <p class="note">Internal tool, so there's no public source.</p>
+              </div>
+              <figure class="flow" aria-labelledby="f2">
+                <figcaption id="f2">How it works</figcaption>
+                <ol class="pipeline">
+                  <li class="stage" style="--i:0"><span class="ico" aria-hidden="true">IN</span><span><b>Rollout emails</b><small>from customers</small></span></li>
+                  <li class="stage" style="--i:1"><span class="ico" aria-hidden="true">JS</span><span><b>Apps Script parser</b><small>pulls out the details</small></span></li>
+                  <li class="stage" style="--i:2"><span class="ico" aria-hidden="true">DB</span><span><b>Ledger check</b><small>seen it before? skip</small></span></li>
+                  <li class="stage" style="--i:3"><span class="ico" aria-hidden="true">&#8644;</span><span><b>Router</b><small>picks team + project</small></span></li>
+                  <li class="stage" style="--i:4"><span class="ico" aria-hidden="true">OUT</span><span><b>Linear issues</b><small>1,000+ and counting</small></span></li>
+                </ol>
+              </figure>
+            </div>
+          </article>
+
+          <article class="case plastic" aria-labelledby="p3" data-reveal>
+            <div class="titlebar"><span class="close" aria-hidden="true"></span><span class="rule" aria-hidden="true"></span><h3 id="p3">Here &amp; Now</h3><span class="rule" aria-hidden="true"></span><span class="tag">Full-stack &middot; side project</span></div>
+            <div class="case-body">
+              <div>
+                <p class="pitch">Free things happening near you, right now. Sign in, share your location, and see nearby events posted by other users and pulled from Ticketmaster.</p>
+                <dl class="facts">
+                  <dt>Why</dt>
+                  <dd>The best free stuff in a city is scattered across a dozen places. This puts it in one list, filtered to what's close.</dd>
+                  <dt>What I built</dt>
+                  <dd><ul>
+                    <li>A <strong>Next.js</strong> app with <strong>Clerk</strong> sign-in.</li>
+                    <li><strong>PostGIS geospatial search</strong> to find events within a radius of you.</li>
+                    <li><strong>User-submitted events</strong> alongside a <strong>Ticketmaster API</strong> integration.</li>
+                  </ul></dd>
+                </dl>
+                <ul class="chips" aria-label="Tech used"><li>Next.js</li><li>TypeScript</li><li>PostGIS</li><li>Clerk</li><li>Ticketmaster API</li></ul>
+                <div class="links">
+                  <a class="key orange" href="https://hereandnow-delta.vercel.app">Try it live<span class="sr-only">: Here &amp; Now</span></a>
+                  <a class="key" href="https://github.com/joncorbin/hereandnow">View source<span class="sr-only"> for Here &amp; Now on GitHub</span></a>
+                </div>
+              </div>
+              <figure class="flow" aria-labelledby="f3">
+                <figcaption id="f3">How it works</figcaption>
+                <ol class="pipeline">
+                  <li class="stage" style="--i:0"><span class="ico" aria-hidden="true">YOU</span><span><b>You + your location</b><small>signed in with Clerk</small></span></li>
+                  <li class="stage" style="--i:1"><span class="ico" aria-hidden="true">WEB</span><span><b>Next.js app</b><small>takes lat / lng</small></span></li>
+                  <li class="stage split" style="--i:2">
+                    <div style="--i:2"><span class="ico" aria-hidden="true">DB</span><span><b>PostGIS</b><small>radius search</small></span></div>
+                    <div style="--i:2"><span class="ico" aria-hidden="true">API</span><span><b>Ticketmaster</b><small>live events</small></span></div>
+                  </li>
+                  <li class="stage" style="--i:3"><span class="ico" aria-hidden="true">OUT</span><span><b>Events near you</b><small>right now, for free</small></span></li>
+                </ol>
+              </figure>
+            </div>
+          </article>
+
+          <article class="case plastic" aria-labelledby="p4" data-reveal>
+            <div class="titlebar"><span class="close" aria-hidden="true"></span><span class="rule" aria-hidden="true"></span><h3 id="p4">AidChain</h3><span class="rule" aria-hidden="true"></span><span class="tag">Hackathon &middot; Sep 2025</span></div>
+            <div class="case-body">
+              <div>
+                <p class="pitch">A prototype for tracking humanitarian donations on the Algorand blockchain, from a donor's wallet to the aid that reaches someone. Built at the EasyA &times; Algorand Hackathon.</p>
+                <dl class="facts">
+                  <dt>My part</dt>
+                  <dd><ul>
+                    <li>The <strong>React + TypeScript frontend</strong>, built from the team's Figma designs.</li>
+                    <li><strong>Wallet-aware navigation</strong> for donors.</li>
+                    <li><strong>Typed models and mock-data services</strong> for donations, campaigns and aid vouchers.</li>
+                    <li><strong>Dashboard aggregation</strong> and tracking utilities.</li>
+                  </ul></dd>
+                </dl>
+                <ul class="chips" aria-label="Tech used"><li>React</li><li>TypeScript</li><li>Tailwind CSS</li><li>Algorand</li></ul>
+                <p class="note">Hackathon build, so there's no public source.</p>
+              </div>
+              <figure class="flow" aria-labelledby="f4">
+                <figcaption id="f4">How it works</figcaption>
+                <ol class="pipeline">
+                  <li class="stage" style="--i:0"><span class="ico" aria-hidden="true">$</span><span><b>Donor wallet</b><small>connects and donates</small></span></li>
+                  <li class="stage" style="--i:1"><span class="ico" aria-hidden="true">&#9670;</span><span><b>Campaign</b><small>pools the funds</small></span></li>
+                  <li class="stage" style="--i:2"><span class="ico" aria-hidden="true">#</span><span><b>Aid voucher</b><small>tracked on Algorand</small></span></li>
+                  <li class="stage" style="--i:3"><span class="ico" aria-hidden="true">OUT</span><span><b>Recipient</b><small>redeems the aid</small></span></li>
+                </ol>
+              </figure>
+            </div>
+          </article>
+
         </div>
       </div>
     </section>
 
     <!-- ===== Skills tray ===== -->
-    <section class="block" id="skills">
+    <section class="block" id="skills" aria-labelledby="skills-title">
       <div class="wrap">
-        <div class="block-head"><span class="num">04</span><h2>Spare keys</h2><p>Everything I work with. Grab one and throw it.</p></div>
-        <div class="tray plastic">
+        <div class="block-head" data-reveal><span class="num" aria-hidden="true">05</span><h2 id="skills-title">Spare keys</h2><p>Everything I work with. Grab one and throw it.</p></div>
+        <div class="tray plastic" data-reveal>
           <div class="tray-inner" id="tray">
             <canvas id="tray-canvas" aria-hidden="true"></canvas>
-            <span class="tray-tip">drag · throw · repeat</span>
+            <span class="tray-tip" aria-hidden="true">drag &middot; throw &middot; repeat</span>
           </div>
+          <p class="sr-only" id="skill-list"></p>
           <div class="tray-bar">
-            <p class="sr-only" id="skill-list"></p>
             <p>
               <span class="rarity" aria-hidden="true">
                 <i style="background:#e9e6dc"></i><i style="background:#4caf50"></i><i style="background:#4a7fd6"></i><i style="background:#8e4fc8"></i><i style="background:#e8b23a"></i>
               </span>
-              &nbsp;Engrams can be decrypted. Click one.
+              Engrams hold facts about me. Click one to decrypt it.
             </p>
             <div class="keys">
               <button class="key dark" id="drop-engram">Drop engram</button>
+              <button class="key" id="decrypt-engram">Decrypt newest</button>
               <button class="key" id="shake">Shake tray</button>
             </div>
           </div>
@@ -561,12 +964,12 @@
     </section>
 
     <!-- ===== Contact ===== -->
-    <section class="block" id="contact">
+    <section class="block" id="contact" aria-labelledby="contact-title">
       <div class="wrap">
-        <div class="modem plastic">
+        <div class="modem plastic" data-reveal>
           <div>
-            <h2>Dial in</h2>
-            <p>Internships, side projects or IT war stories. My line's open.</p>
+            <h2 id="contact-title">Dial in</h2>
+            <p>I'm looking for a <strong>software engineering internship for summer 2027</strong>. Also happy to talk integrations, AI tooling, IT or side projects.</p>
             <div class="lights" aria-hidden="true">
               <span><i class="on"></i>PWR</span>
               <span><i class="on"></i>RD</span>
@@ -575,8 +978,9 @@
             </div>
           </div>
           <div class="dial">
-            <p class="number"><small>ATDT</small>jonathankcorbin [at] gmail [dot] com</p>
+            <p class="number"><small aria-hidden="true">ATDT</small><span class="sr-only">Email: </span>jonathankcorbin [at] gmail [dot] com</p>
             <a class="key" href="https://www.linkedin.com/in/jonkcorbin/">LinkedIn</a>
+            <a class="key" href="https://github.com/joncorbin">GitHub</a>
           </div>
         </div>
       </div>
@@ -586,20 +990,68 @@
   <footer>
     <div class="wrap">
       <span class="stripes" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-      <span>© <span id="year">2026</span> Jon Corbin · Built on a JC ][</span>
-      <span title="You know the one.">↑ ↑ ↓ ↓ ← → ← → B A</span>
+      <span>&copy; <span id="year">2026</span> Jon Corbin &middot; Built on a JC ][</span>
+      <em title="Type it. Anywhere.">Per audacia ad astra.</em>
     </div>
   </footer>
 
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
   <script>
   (() => {
+    document.documentElement.classList.add("js");
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     const sleep = (ms) => new Promise((r) => setTimeout(r, reduceMotion ? 0 : ms));
     const $ = (id) => document.getElementById(id);
-    document.getElementById("year").textContent = new Date().getFullYear();
+    const loadedAt = Date.now();
+    $("year").textContent = new Date().getFullYear();
+    const store = {
+      get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+      set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+    };
+
+    /* ================= Sound (off by default) ================= */
+    let audio = null;
+    let soundOn = false;
+    function beep(freq = 880, dur = 0.08, vol = 0.04, type = "square") {
+      if (!soundOn) return;
+      try {
+        audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+        const o = audio.createOscillator();
+        const g = audio.createGain();
+        o.type = type;
+        o.frequency.value = freq;
+        g.gain.setValueAtTime(vol, audio.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + dur);
+        o.connect(g).connect(audio.destination);
+        o.start();
+        o.stop(audio.currentTime + dur);
+      } catch (e) {}
+    }
+    const soundBtn = $("sound-toggle");
+    function setSound(on) {
+      soundOn = on;
+      soundBtn.setAttribute("aria-pressed", String(on));
+      beep(1000, 0.12, 0.05);
+    }
+    soundBtn.addEventListener("click", () => setSound(!soundOn));
+
+    /* ================= Room lights ================= */
+    const lightsBtn = $("lights-toggle");
+    function syncLights() {
+      const dark = document.documentElement.dataset.room === "dark";
+      lightsBtn.setAttribute("aria-pressed", String(dark));
+      document.querySelector('meta[name="theme-color"]').content = dark ? "#15110c" : "#efe7d4";
+    }
+    function setRoom(room) {
+      document.documentElement.dataset.room = room;
+      store.set("room", room);
+      syncLights();
+    }
+    lightsBtn.addEventListener("click", () => setRoom(document.documentElement.dataset.room === "dark" ? "light" : "dark"));
+    syncLights();
 
     /* ================= Toast ================= */
     const toastEl = $("toast");
@@ -612,23 +1064,89 @@
       toastEl.append(b, document.createTextNode(msg));
       toastEl.classList.add("show");
       clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => toastEl.classList.remove("show"), 4200);
+      toastTimer = setTimeout(() => toastEl.classList.remove("show"), 4600);
+    }
+
+    /* ================= Ghost ================= */
+    // Faceted shell plates around a glowing eye. Drawn from scratch; each plate is a kite
+    // split into a lit and a shaded half so it reads as 3D.
+    function ghostSVG(extraClass) {
+      const plate = (a, minor) => {
+        const [w, tip] = minor ? [8, 38] : [13, 54];
+        return `<g transform="rotate(${a})"${minor ? ' class="minor"' : ""}><g class="plate">
+          <path class="lit" d="M0 -18 L${-w} ${-22 - w / 4} L0 ${-tip} Z"/>
+          <path class="shade" d="M0 -18 L${w} ${-22 - w / 4} L0 ${-tip} Z"/></g></g>`;
+      };
+      const plates = [45, 135, 225, 315].map((a) => plate(a, true)).join("") + [0, 90, 180, 270].map((a) => plate(a, false)).join("");
+      return `<svg class="ghost ${extraClass || ""}" viewBox="-64 -64 128 128" aria-hidden="true" focusable="false">
+        <g class="bob">
+          <circle class="scan-ring" r="20"/>
+          <g class="shell">${plates}</g>
+          <circle class="core" r="19"/>
+          <circle class="eye-glow" r="12"/>
+          <circle class="iris" r="10"/>
+          <g class="pupil-g"><circle class="pupil" r="4.6"/><circle class="glint" cx="-1.8" cy="-1.8" r="1.4"/></g>
+        </g>
+      </svg>`;
+    }
+    const ghostBtn = $("ghost-btn");
+    ghostBtn.innerHTML = ghostSVG();
+    const portraitGhost = ghostBtn.querySelector(".ghost");
+    const ghostQuips = [
+      "Scan complete: one software engineer, seeking a summer 2027 internship.",
+      "Scanning... found 1,000+ Linear issues. Not bad, Guardian.",
+      "Scan complete. Light level 2028. Ready for the next mission.",
+      "I'm detecting $833K in savings. And a lot of coffee.",
+    ];
+    let quip = 0;
+    ghostBtn.addEventListener("click", () => {
+      portraitGhost.classList.remove("scanning");
+      void portraitGhost.getBoundingClientRect();
+      portraitGhost.classList.add("scanning");
+      setTimeout(() => portraitGhost.classList.remove("scanning"), 2600);
+      beep(660, 0.1, 0.04, "sine"); setTimeout(() => beep(990, 0.12, 0.04, "sine"), 110);
+      toast("Ghost", ghostQuips[quip++ % ghostQuips.length], "#6fd7ff");
+    });
+    // The eye follows the pointer.
+    if (finePointer && !reduceMotion) {
+      let raf = 0, px = 0, py = 0;
+      window.addEventListener("pointermove", (e) => {
+        px = e.clientX; py = e.clientY;
+        if (raf) return;
+        raf = requestAnimationFrame(() => {
+          raf = 0;
+          document.querySelectorAll(".ghost").forEach((g) => {
+            const r = g.getBoundingClientRect();
+            if (!r.width || r.bottom < 0 || r.top > innerHeight) return;
+            const dx = px - (r.left + r.width / 2), dy = py - (r.top + r.height / 2);
+            const d = Math.hypot(dx, dy) || 1;
+            const k = Math.min(1, d / 300);
+            const ux = (dx / d) * k, uy = (dy / d) * k;
+            g.querySelector(".iris").setAttribute("transform", `translate(${ux * 3} ${uy * 3})`);
+            g.querySelector(".eye-glow").setAttribute("transform", `translate(${ux * 3} ${uy * 3})`);
+            g.querySelector(".pupil-g").setAttribute("transform", `translate(${ux * 5} ${uy * 5})`);
+          });
+        });
+      }, { passive: true });
     }
 
     /* ================= Terminal ================= */
     const out = $("term-out");
     const term = $("term");
+    const screen = $("screen");
     const inputRow = $("term-input-row");
     const input = $("term-input");
     const history = [];
     let histIdx = 0;
+    let game = null;
 
+    const scrollTerm = () => { term.scrollTop = term.scrollHeight; };
     function print(text = "", cls) {
       const div = document.createElement("div");
       div.className = "term-line" + (cls ? " " + cls : "");
       div.textContent = text;
       out.appendChild(div);
-      term.scrollTop = term.scrollHeight;
+      scrollTerm();
       return div;
     }
     function printLink(label, href) {
@@ -639,85 +1157,178 @@
       a.textContent = label;
       div.appendChild(a);
       out.appendChild(div);
-      term.scrollTop = term.scrollHeight;
+      scrollTerm();
     }
-
-    const ghostArt = String.raw`
-       /\
-      /  \
-     / () \
-     \    /
-      \  /
-       \/`;
-
-    const errorCodes = ["BEAVER", "WEASEL", "CENTIPEDE", "BABOON", "CABBAGE", "LETTUCE"];
+    function printHTML(html) {
+      const div = document.createElement("div");
+      div.innerHTML = html;
+      out.appendChild(div);
+      scrollTerm();
+      return div;
+    }
     const goTo = (id) => document.getElementById(id).scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
+    const uptime = () => {
+      const s = Math.floor((Date.now() - loadedAt) / 1000);
+      return `${Math.floor(s / 3600)}:${String(Math.floor(s / 60) % 60).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+    };
+    const errorCodes = ["BEAVER", "WEASEL", "CENTIPEDE", "BABOON", "CABBAGE", "LETTUCE", "MARIONBERRY"];
 
     const commands = {
-      help() {
-        print("COMMANDS:");
-        print("  WHOAMI    ABOUT     QUESTS");
-        print("  PROJECTS  SKILLS    CONTACT");
-        print("  LS        CLEAR     COLOR");
-        print("THERE ARE ALSO A FEW I'M NOT LISTING.", "dim");
-      },
-      whoami() {
+      help: { desc: "LIST COMMANDS", run() {
+        const names = Object.keys(commands).filter((k) => !commands[k].hidden).map((k) => k.toUpperCase());
+        print("AVAILABLE COMMANDS:");
+        for (let i = 0; i < names.length; i += 4) print("  " + names.slice(i, i + 4).map((n) => n.padEnd(10)).join(""));
+        print("TAB COMPLETES. UP/DOWN FOR HISTORY.", "dim");
+        print("SOME COMMANDS AREN'T LISTED.", "dim");
+      } },
+      whoami: { desc: "WHO IS THIS", run() {
         print("JON CORBIN");
         print("CS + RELIGIOUS STUDIES @ BROWN '28");
-        print("INTERIM HEAD OF IT @ MAVEN AGI");
-      },
-      about() {
-        print("I RUN IT AT MAVEN AGI AS A ONE-PERSON");
-        print("DEPARTMENT, AND I WRITE THE CODE THAT");
-        print("KEEPS IT FROM BEING MANUAL WORK.");
-        print("OPENING CHARACTER SHEET...", "dim");
-        goTo("about");
-      },
-      quests() { print("LOADING QUEST LOG...", "dim"); goTo("quests"); },
-      experience() { commands.quests(); },
-      projects() {
-        print("DISK 1  COMPLAINT RESOLUTION AI");
-        print("DISK 2  HERE & NOW");
-        print("DISK 3  AIDCHAIN");
-        print("INSERT A DISK BELOW.", "dim");
-        goTo("disks");
-      },
-      skills() { print("SPILLING THE KEYCAPS...", "dim"); goTo("skills"); },
-      contact() {
+        print("IT ENGINEER @ MAVEN AGI");
+        print("SEEKING: SWE INTERNSHIP, SUMMER 2027", "dim");
+      } },
+      about: { desc: "OPEN CHARACTER SHEET", run() { print("OPENING CHARACTER SHEET...", "dim"); goTo("about"); } },
+      scores: { desc: "HIGH SCORES", run() {
+        print("1ST  $833K   SAAS SAVINGS REPORTED");
+        print("2ND  1,000+  LINEAR ISSUES AUTOMATED");
+        print("3RD  -23%    HARDWARE SPEND");
+        print("4TH  10+     APPS MOVED TO SSO");
+        print("5TH  74      AUTOMATED TESTS");
+        print("SCROLLING TO THE BOARD...", "dim");
+        goTo("scores");
+      } },
+      quests: { desc: "CAREER MAP", run() { print("LOADING QUEST LOG...", "dim"); goTo("quests"); } },
+      projects: { desc: "WHAT I'VE BUILT", run() {
+        print("1  COMPLAINT RESOLUTION AI   (AI AGENTS)");
+        print("2  ROLLOUT -> LINEAR         (AT WORK)");
+        print("3  HERE & NOW                (FULL-STACK)");
+        print("4  AIDCHAIN                  (HACKATHON)");
+        print("OPENING CASE FILES...", "dim");
+        goTo("projects");
+      } },
+      skills: { desc: "SPILL THE KEYCAPS", run() { print("SPILLING THE KEYCAPS...", "dim"); goTo("skills"); } },
+      hire: { desc: "THE PITCH", run() {
+        print("SEEKING: SOFTWARE ENGINEERING INTERN", "inv");
+        print("WHEN:    SUMMER 2027");
+        print("");
+        print("WHY ME:");
+        print(" + I SHIP INTEGRATIONS PEOPLE RELY ON.");
+        print("   (1,000+ ISSUES FILED BY MY LINEAR BOT)");
+        print(" + I BUILD AI AGENTS, WITH TESTS.");
+        print(" + I TALK TO CUSTOMERS AND TURN THAT");
+        print("   INTO WORKING SOFTWARE.");
+        print(" + I SAVE MONEY. ($833K OF IT)");
+        print("");
+        print("TYPE CONTACT TO REACH ME.", "dim");
+      } },
+      contact: { desc: "HOW TO REACH ME", run() {
         print("MAIL  JONATHANKCORBIN [AT] GMAIL [DOT] COM");
         printLink("WEB   LINKEDIN.COM/IN/JONKCORBIN", "https://www.linkedin.com/in/jonkcorbin/");
         printLink("CODE  GITHUB.COM/JONCORBIN", "https://github.com/joncorbin");
-      },
-      ls() { print("ABOUT.TXT   QUESTS.LOG   PROJECTS/"); print("SKILLS.BIN  CONTACT.TXT  .GHOST"); },
-      cat(arg) {
-        const map = { "ABOUT.TXT": "about", "QUESTS.LOG": "quests", "CONTACT.TXT": "contact", "SKILLS.BIN": "skills", ".GHOST": "ghost" };
-        if (map[arg]) return commands[map[arg]]();
-        print(arg ? "FILE NOT FOUND: " + arg : "CAT WHAT?");
-      },
-      clear() { out.innerHTML = ""; },
-      cls() { commands.clear(); },
-      color(arg) {
+      } },
+      neofetch: { desc: "SYSTEM INFO", run() {
+        const logo = ["     JJJJJ  CCCCC ", "        JJ CC     ", "        JJ CC     ", "  JJ    JJ CC     ", "   JJJJJJ   CCCCC ", "                  "];
+        const info = [
+          "JON@MAVEN", "---------",
+          "OS      JC ][ ROM 2.0",
+          "HOST    BROWN UNIVERSITY '28",
+          "ROLE    IT ENGINEER, MAVEN AGI",
+          "SEEKING SWE INTERN, SUMMER 2027",
+          "LANGS   PY  TS  JAVA  C++",
+          "SHELL   JCSH 1.0",
+          "UPTIME  " + uptime(),
+          "PHOSPHR " + (document.documentElement.dataset.phosphor || "green").toUpperCase(),
+        ];
+        if (term.clientWidth < 560) { logo.slice(0, 5).forEach((l) => print(l)); info.forEach((l) => print(l)); }
+        else {
+          const rows = Math.max(logo.length, info.length);
+          const pre = document.createElement("pre");
+          pre.textContent = Array.from({ length: rows }, (_, i) => (logo[i] || "".padEnd(18)) + "  " + (info[i] || "")).join("\n");
+          out.appendChild(pre);
+        }
+        printHTML(`<span aria-hidden="true">${["#1a1a1a", "#c4442b", "#e8b23a", "#2f7f78", "#e2702a", "#6b4a2b", "#e3d8bf"].map((c) => `<span style="display:inline-block;width:22px;height:14px;background:${c};margin-right:4px"></span>`).join("")}</span>`);
+      } },
+      play: { desc: "BECOME XOL, WILL OF THOUSANDS", run() { startXol(); } },
+      ghost: { desc: "SUMMON YOUR GHOST", run() {
+        printHTML(ghostSVG("phos"));
+        print("EYES UP, GUARDIAN.");
+        beep(660, 0.1, 0.04, "sine"); setTimeout(() => beep(990, 0.14, 0.04, "sine"), 120);
+      } },
+      color: { desc: "CHANGE PHOSPHOR", run(arg) {
         const modes = ["GREEN", "AMBER", "WHITE"];
         const cur = (document.documentElement.dataset.phosphor || "green").toUpperCase();
         const next = modes.includes(arg) ? arg : modes[(modes.indexOf(cur) + 1) % modes.length];
         if (next === "GREEN") delete document.documentElement.dataset.phosphor;
         else document.documentElement.dataset.phosphor = next.toLowerCase();
         print("PHOSPHOR: " + next);
-      },
-      ghost() {
-        ghostArt.split("\n").forEach((l) => print(l));
-        print("");
-        print("EYES UP, GUARDIAN.");
-      },
-      engram() {
+      } },
+      lights: { desc: "TOGGLE ROOM LIGHTS", run() {
+        setRoom(document.documentElement.dataset.room === "dark" ? "light" : "dark");
+        print("LIGHTS " + (document.documentElement.dataset.room === "dark" ? "OFF. NICE AND MOODY." : "ON."));
+      } },
+      sound: { desc: "SOUND ON / OFF", run(arg) {
+        setSound(arg === "ON" ? true : arg === "OFF" ? false : !soundOn);
+        print("SOUND " + (soundOn ? "ON" : "OFF"));
+      } },
+      ls: { desc: "LIST FILES", run() { print("ABOUT.TXT   SCORES.DAT   QUESTS.LOG"); print("PROJECTS/   SKILLS.BIN   CONTACT.TXT"); print(".GHOST", "dim"); } },
+      cat: { desc: "READ A FILE", run(arg) {
+        const map = { "ABOUT.TXT": "whoami", "SCORES.DAT": "scores", "QUESTS.LOG": "quests", "CONTACT.TXT": "contact", "SKILLS.BIN": "skills", ".GHOST": "ghost", "PROJECTS": "projects", "PROJECTS/": "projects" };
+        if (map[arg]) return commands[map[arg]].run();
+        print(arg ? "FILE NOT FOUND: " + arg : "CAT WHAT? TRY LS.");
+      } },
+      echo: { desc: "SAY SOMETHING", run(arg) { print(arg || ""); } },
+      history: { desc: "PAST COMMANDS", run() { history.forEach((h, i) => print(String(i + 1).padStart(3) + "  " + h)); } },
+      date: { desc: "TODAY", run() { print(new Date().toDateString().toUpperCase()); } },
+      uptime: { desc: "SESSION LENGTH", run() { print("UP " + uptime() + ", 1 USER (HI)"); } },
+      top: { desc: "RUNNING PROCESSES", run() {
+        print("PID  PROCESS              CPU");
+        print("001  automation.py        41%");
+        print("002  linear-sync.gs       23%");
+        print("003  homework.exe         19%");
+        print("004  side-project.ts      12%");
+        print("005  destiny2.exe          5%");
+        print("006  sleep                0.4%", "dim");
+      } },
+      man: { desc: "DESCRIBE A COMMAND", run(arg) {
+        const c = commands[(arg || "").toLowerCase()];
+        if (c && !c.hidden) print(arg + ": " + c.desc);
+        else print(arg ? "NO MANUAL ENTRY FOR " + arg : "MAN WHAT? TRY MAN PLAY.");
+      } },
+      reboot: { desc: "RESTART", run() { out.innerHTML = ""; boot(true); } },
+      clear: { desc: "CLEAR SCREEN", run() { out.innerHTML = ""; } },
+      // ---- unlisted ----
+      cls: { hidden: true, run() { out.innerHTML = ""; } },
+      xol: { hidden: true, run() { startXol(); } },
+      snake: { hidden: true, run() { print("YOU MEAN XOL.", "dim"); startXol(); } },
+      experience: { hidden: true, run() { commands.quests.run(); } },
+      resume: { hidden: true, run() { print("COMING SOON. TRY HIRE FOR NOW."); } },
+      engram: { hidden: true, run() {
         if (window.__dropEngram) { window.__dropEngram(); print("AN ENGRAM DROPPED IN THE SKILLS TRAY."); }
-        else print("THE TRAY ISN'T LOADED YET.");
-      },
-      date() { print(new Date().toDateString().toUpperCase()); },
-      sudo() { print("NICE TRY."); },
-      exit() { print("THERE IS NO EXIT. ONLY MORE SIDE PROJECTS."); },
-      hello() { print("HI THERE."); },
-      konami() { print("YOU KNOW THE ONE. TRY IT ON THE KEYBOARD.", "dim"); },
+        else print("THE TRAY ISN'T LOADED YET. SCROLL DOWN FIRST.");
+      } },
+      light: { hidden: true, run() { print("LIGHT LEVEL: 2028. GRADUATION IS THE PINNACLE DROP."); } },
+      sudo: { hidden: true, run() { print("NICE TRY."); } },
+      rm: { hidden: true, run() { print("ROOT IS PROTECTED BY A VERY TIRED IT ENGINEER."); } },
+      exit: { hidden: true, run() { print("THERE IS NO EXIT. ONLY MORE SIDE PROJECTS."); } },
+      hello: { hidden: true, run() { print("HI THERE."); } },
+      xyzzy: { hidden: true, run() { print("NOTHING HAPPENS."); } },
+      marathon: { hidden: true, async run() {
+        print("ESTABLISHING TERMINAL LINK...", "dim");
+        await sleep(400);
+        print("COLONY SHIP TERMINAL 7 // READ ONLY");
+        print("AI STATUS: RAMPANCY... NOMINAL");
+        print("PATTERN BUFFER: SAVED");
+        print("NO HOSTILE AIS DETECTED. PROBABLY.", "dim");
+      } },
+      halo: { hidden: true, async run() {
+        const d = print("");
+        for (let p = 0; p <= 10; p++) {
+          d.textContent = "SHIELDS [" + "#".repeat(p) + ".".repeat(10 - p) + "] " + p * 10 + "%";
+          beep(300 + p * 60, 0.04, 0.03);
+          await sleep(90);
+        }
+        print("SHIELDS FULL. BACK IN THE FIGHT.");
+      } },
     };
 
     function run(raw) {
@@ -726,25 +1337,47 @@
       if (!line) return;
       history.push(line);
       histIdx = history.length;
+      if (checkPhrase(line)) return;
       const [cmd, ...rest] = line.split(/\s+/);
-      const fn = commands[cmd.toLowerCase()];
-      if (fn) fn(rest.join(" "));
+      const c = commands[cmd.toLowerCase()];
+      if (c) c.run(rest.join(" "));
       else {
         print("?SYNTAX ERROR");
         print("ERROR CODE: " + errorCodes[Math.floor(Math.random() * errorCodes.length)], "dim");
+        beep(220, 0.18, 0.05);
       }
     }
 
     input.addEventListener("keydown", (e) => {
+      if (e.key.length === 1) beep(1500 + Math.random() * 300, 0.015, 0.015);
       if (e.key === "Enter") { run(input.value); input.value = ""; }
       else if (e.key === "ArrowUp" && history.length) { histIdx = Math.max(0, histIdx - 1); input.value = history[histIdx]; e.preventDefault(); }
       else if (e.key === "ArrowDown" && history.length) { histIdx = Math.min(history.length, histIdx + 1); input.value = history[histIdx] || ""; e.preventDefault(); }
+      else if (e.key === "l" && e.ctrlKey) { out.innerHTML = ""; e.preventDefault(); }
+      else if (e.key === "Tab" && input.value.trim()) {
+        // Complete the command name; leave Tab alone on an empty line so keyboard users can move on.
+        e.preventDefault();
+        const v = input.value.trim().toLowerCase();
+        const hits = Object.keys(commands).filter((k) => !commands[k].hidden && k.startsWith(v));
+        if (hits.length === 1) input.value = hits[0].toUpperCase() + " ";
+        else if (hits.length > 1) { print("]" + v.toUpperCase()); print(hits.map((h) => h.toUpperCase()).join("  "), "dim"); }
+      }
     });
-    $("screen").addEventListener("click", (e) => {
-      if (e.target.tagName !== "A" && !inputRow.hidden) input.focus({ preventScroll: true });
+    screen.addEventListener("click", (e) => {
+      if (e.target.closest("a") || game || inputRow.hidden) return;
+      input.focus({ preventScroll: true });
     });
+    document.querySelectorAll("[data-cmd]").forEach((b) => b.addEventListener("click", () => {
+      if (game) endXol();
+      if (inputRow.hidden) return;
+      run(b.dataset.cmd);
+    }));
 
-    async function boot() {
+    async function boot(again) {
+      inputRow.hidden = true;
+      if (!reduceMotion) { term.classList.remove("power-on"); void term.offsetWidth; term.classList.add("power-on"); }
+      beep(1000, 0.18, 0.05);
+      await sleep(again ? 300 : 700);
       const lines = [
         ["JC ][ ROM V2.0  (C) 1977-2026", "dim"],
         ["MEMORY CHECK ........ 64K OK", "dim"],
@@ -752,101 +1385,214 @@
         ["LOADING GHOST.SYS ... OK", "dim"],
         [""],
       ];
-      for (const [t, c] of lines) { print(t, c); await sleep(260); }
+      for (const [t, c] of lines) { print(t, c); await sleep(200); }
       print("JC ][", "big");
-      await sleep(200);
+      await sleep(160);
       print("JON CORBIN");
-      print("BROWN CS '28 / HEAD OF IT @ MAVEN AGI");
+      print("BROWN CS '28 / IT ENGINEER @ MAVEN AGI");
       print("");
       print("TYPE HELP AND PRESS RETURN.");
       inputRow.hidden = false;
     }
     boot();
 
-    /* ================= Pixel companion ================= */
-    // 16x16 sprite: a little geometric companion with one eye.
-    const spriteRows = [
-      "................",
-      ".......oo.......",
-      "......oyyo......",
-      ".....oyyyyo.....",
-      "....oyyccyyo....",
-      "...oyyc..cyyo...",
-      "..oyyc.ww.cyyo..",
-      ".oyyc.wbbw.cyyo.",
-      ".oyyc.wbbw.cyyo.",
-      "..oyyc.ww.cyyo..",
-      "...oyyc..cyyo...",
-      "....oyyccyyo....",
-      ".....oyyyyo.....",
-      "......oyyo......",
-      ".......oo.......",
-      "................",
-    ];
-    const pal = { o: "#1a140e", y: "#e3d8bf", c: "#9c8d6b", w: "#7cff6b", b: "#2f7f78", ".": "transparent" };
-    const sprite = $("sprite");
-    spriteRows.join("").split("").forEach((ch) => {
-      const i = document.createElement("i");
-      i.style.background = pal[ch];
-      sprite.appendChild(i);
-    });
+    /* ---------- Xol, Will of Thousands (a worm game) ---------- */
+    // You are the worm god. Eat orbs of light, don't hit the walls or yourself.
+    function startXol() {
+      const COLS = term.clientWidth < 460 ? 20 : 26;
+      const ROWS = 10;
+      inputRow.hidden = true;
+      out.innerHTML = "";
+      out.setAttribute("aria-live", "off");
+      const title = document.createElement("div");
+      title.className = "term-line";
+      title.textContent = "XOL, WILL OF THOUSANDS";
+      const pre = document.createElement("pre");
+      pre.setAttribute("aria-hidden", "true");
+      const status = document.createElement("div");
+      status.className = "term-line game-status";
+      const sr = document.createElement("p");
+      sr.className = "sr-only";
+      sr.setAttribute("aria-live", "assertive");
+      out.append(title, pre, status, sr);
+      const best = () => Number(store.get("xol-best") || 0);
+      let worm, dir, nextDir, orb, score, dead, timer;
+      function placeOrb() {
+        do { orb = { x: Math.floor(Math.random() * COLS), y: Math.floor(Math.random() * ROWS) }; }
+        while (worm.some((s) => s.x === orb.x && s.y === orb.y));
+      }
+      function reset() {
+        worm = [{ x: 6, y: 5 }, { x: 5, y: 5 }, { x: 4, y: 5 }];
+        dir = { x: 1, y: 0 }; nextDir = dir; score = 0; dead = false;
+        placeOrb();
+        draw();
+        sr.textContent = "Xol awakens. Use arrow keys or W A S D to eat orbs of light. Escape quits.";
+        clearInterval(timer);
+        timer = setInterval(step, 115);
+      }
+      function draw() {
+        const rows = ["+" + "-".repeat(COLS) + "+"];
+        for (let y = 0; y < ROWS; y++) {
+          let r = "|";
+          for (let x = 0; x < COLS; x++) {
+            const i = worm.findIndex((s) => s.x === x && s.y === y);
+            r += i === 0 ? "@" : i > 0 ? (i % 2 ? "=" : "~") : orb.x === x && orb.y === y ? "*" : " ";
+          }
+          rows.push(r + "|");
+        }
+        rows.push("+" + "-".repeat(COLS) + "+");
+        pre.textContent = rows.join("\n");
+        status.textContent = dead
+          ? `XOL HAS FALLEN. ORBS: ${score}  BEST: ${best()}  [R]ETRY  [ESC]`
+          : `ORBS OF LIGHT: ${score}  BEST: ${best()}  ESC QUITS`;
+      }
+      function step() {
+        dir = nextDir;
+        const head = { x: worm[0].x + dir.x, y: worm[0].y + dir.y };
+        const hitWall = head.x < 0 || head.y < 0 || head.x >= COLS || head.y >= ROWS;
+        const hitSelf = worm.slice(0, -1).some((s) => s.x === head.x && s.y === head.y);
+        if (hitWall || hitSelf) {
+          dead = true;
+          clearInterval(timer);
+          if (score > best()) store.set("xol-best", String(score));
+          beep(160, 0.35, 0.06, "sawtooth");
+          sr.textContent = `Xol has fallen with ${score} orbs of light. Press R to retry or Escape to quit.`;
+          draw();
+          return;
+        }
+        worm.unshift(head);
+        if (head.x === orb.x && head.y === orb.y) {
+          score++;
+          beep(1200, 0.06, 0.04);
+          if (score % 5 === 0) sr.textContent = `${score} orbs of light.`;
+          placeOrb();
+        } else worm.pop();
+        draw();
+      }
+      const dirs = { ArrowUp: [0, -1], w: [0, -1], ArrowDown: [0, 1], s: [0, 1], ArrowLeft: [-1, 0], a: [-1, 0], ArrowRight: [1, 0], d: [1, 0] };
+      function onKey(e) {
+        const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+        if (k === "Escape" || k === "q") { e.preventDefault(); endXol(); return; }
+        if (dead && (k === "r" || k === "Enter")) { e.preventDefault(); reset(); return; }
+        const v = dirs[k];
+        if (v) {
+          e.preventDefault();
+          if (v[0] !== -dir.x || v[1] !== -dir.y) nextDir = { x: v[0], y: v[1] };
+        }
+      }
+      let touch0 = null;
+      const onTouchStart = (e) => { touch0 = e.touches[0]; };
+      const onTouchEnd = (e) => {
+        if (!touch0) return;
+        const t = e.changedTouches[0];
+        const dx = t.clientX - touch0.clientX, dy = t.clientY - touch0.clientY;
+        touch0 = null;
+        if (dead) { reset(); return; }
+        if (Math.max(Math.abs(dx), Math.abs(dy)) < 20) return;
+        const v = Math.abs(dx) > Math.abs(dy) ? [Math.sign(dx), 0] : [0, Math.sign(dy)];
+        if (v[0] !== -dir.x || v[1] !== -dir.y) nextDir = { x: v[0], y: v[1] };
+      };
+      window.addEventListener("keydown", onKey, true);
+      screen.addEventListener("touchstart", onTouchStart, { passive: true });
+      screen.addEventListener("touchend", onTouchEnd, { passive: true });
+      screen.setAttribute("tabindex", "0");
+      screen.setAttribute("aria-label", "Xol game. Arrow keys to move, Escape to quit.");
+      screen.focus({ preventScroll: true });
+      game = {
+        stop() {
+          clearInterval(timer);
+          window.removeEventListener("keydown", onKey, true);
+          screen.removeEventListener("touchstart", onTouchStart);
+          screen.removeEventListener("touchend", onTouchEnd);
+          screen.removeAttribute("tabindex");
+          screen.removeAttribute("aria-label");
+          return score;
+        },
+      };
+      reset();
+    }
+    function endXol() {
+      if (!game) return;
+      const score = game.stop();
+      game = null;
+      out.innerHTML = "";
+      out.setAttribute("aria-live", "polite");
+      print(`XOL SLEEPS. ORBS OF LIGHT: ${score}  BEST: ${store.get("xol-best") || 0}`);
+      inputRow.hidden = false;
+      input.focus({ preventScroll: true });
+    }
+
+    /* ================= Monitor tilt ================= */
+    if (finePointer && !reduceMotion) {
+      const rig = $("rig");
+      const monitor = $("monitor");
+      rig.addEventListener("pointermove", (e) => {
+        const r = rig.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - 0.5;
+        const y = (e.clientY - r.top) / r.height - 0.5;
+        monitor.style.setProperty("--ry", (x * 7).toFixed(2) + "deg");
+        monitor.style.setProperty("--rx", (-y * 5).toFixed(2) + "deg");
+      });
+      rig.addEventListener("pointerleave", () => { monitor.style.setProperty("--ry", "0deg"); monitor.style.setProperty("--rx", "0deg"); });
+    }
 
     /* ================= Attributes ================= */
-    // EDIT: these are guesses, set your own levels (0-10).
-    const stats = [["Automation", 9], ["Identity & access", 9], ["AI tooling", 7], ["Frontend", 6], ["Radar", 4]];
+    // EDIT: self-assessed, set your own levels (0-10).
+    const stats = [["Backend & APIs", 8], ["AI agents & LLM tooling", 8], ["Integrations & automation", 9], ["Customer translation", 9], ["Testing", 7], ["Frontend", 6]];
     $("stats").innerHTML = stats.map(([name, v]) => `
       <div class="stat">
-        <div class="stat-top"><span>${name}</span><span>${v}/10</span></div>
-        <div class="bar" role="img" aria-label="${name}: ${v} out of 10">${Array.from({ length: 10 }, (_, i) => `<i class="${i < v ? "on" : ""}"></i>`).join("")}</div>
+        <div class="stat-top"><span>${name}</span><span aria-hidden="true">${v}/10</span></div>
+        <div class="bar" role="img" aria-label="${name}: ${v} out of 10">${Array.from({ length: 10 }, (_, i) => `<i class="${i < v ? "on" : ""}" style="--n:${i}"></i>`).join("")}</div>
       </div>`).join("");
 
     /* ================= Quest log ================= */
     const quests = [
       {
-        x: 70, y: 170, label: "2023", sub: "MIT LL", state: "done",
+        x: 70, y: 180, label: "2023", sub: "MIT LL", state: "done",
         title: "Student Engineer", where: "MIT Lincoln Laboratory · LLRISE · Jul–Aug 2023",
         objectives: ["Build and test radar systems in Python on research hardware", "Get Doppler and synthetic aperture radar working", "Lead team experiments"],
         rewards: ["Radar fundamentals", "First run on real research hardware"],
       },
       {
-        x: 380, y: 70, label: "2026", sub: "Intern", state: "done",
+        x: 380, y: 80, label: "2026", sub: "Intern", state: "done",
         title: "IT, Ops & SWE Intern", where: "Maven AGI · Boston · May–Sep 2026",
-        objectives: ["Lead SSO + SCIM rollout across 10+ enterprise apps (Okta, Google Workspace)", "Co-lead a SaaS cost-reduction initiative", "Design Otto, an AI support platform linking Slack and Linear"],
-        rewards: ["$833K in SaaS savings reported (H2 2026)", "−23% hardware spend", "Unlocked: Interim Head of IT"],
+        objectives: ["Lead the SSO + SCIM rollout across 10+ enterprise apps (Okta, Google Workspace)", "Co-lead a SaaS cost-reduction initiative: analyze spend, work with vendor owners, follow through on new contract terms", "Cut hardware spending", "Design Otto, an AI support platform linking Slack requests to Linear tickets"],
+        rewards: ["$833K in SaaS savings reported (H2 2026)", "−23% hardware spend", "Unlocked: IT Engineer"],
       },
       {
-        x: 700, y: 160, label: "NOW", sub: "Head of IT", state: "active",
-        title: "Interim Head of IT", where: "Maven AGI · Boston · Sep 2026–present",
-        objectives: ["Run IT solo: onboarding, offboarding, identity, devices, SaaS security", "Manage Ramp cards with Finance and People Ops", "Ship a Google Apps Script + Linear API integration"],
+        x: 700, y: 170, label: "NOW", sub: "IT Engineer", state: "active",
+        title: "IT Engineer", where: "Maven AGI · Boston · Sep 2026–present",
+        objectives: ["Run IT solo as the department's interim head: onboarding, offboarding, identity, devices, SaaS security and compliance", "Build a Google Apps Script + Linear API integration for customer rollouts", "Manage Ramp cards with Finance and People Ops"],
         rewards: ["1,000+ issues auto-filed from rollout emails", "Team and project routing with a duplicate-proof ledger"],
       },
       {
-        x: 930, y: 80, label: "NEXT", sub: "???", state: "locked",
-        title: "???", where: "Quest not yet discovered",
-        objectives: ["Find the next internship or interesting project"],
-        rewards: ["Could be yours. Send a message ↓"],
+        x: 930, y: 90, label: "NEXT", sub: "SWE intern", state: "locked",
+        title: "Software Engineering Intern", where: "Summer 2027 · team not yet discovered",
+        objectives: ["Join a team building real software", "Ship something users touch"],
+        rewards: ["Could be yours. Dial in below ↓"],
       },
     ];
     const svgNS = "http://www.w3.org/2000/svg";
     const map = $("map");
     const questEl = $("quest");
+    const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
     function showQuest(i) {
       const q = quests[i];
-      map.querySelectorAll(".node").forEach((n, j) => n.classList.toggle("selected", i === j));
+      map.querySelectorAll(".node").forEach((n, j) => n.setAttribute("aria-pressed", String(i === j)));
       const statusText = { done: "Complete", active: "In progress", locked: "Locked" }[q.state];
       questEl.className = "quest" + (q.state === "active" ? " is-active" : q.state === "locked" ? " is-locked" : "");
       questEl.innerHTML = `
         <div>
           <span class="status ${q.state}">${statusText}</span>
-          <h3>${q.title}</h3>
-          <p class="where">${q.where}</p>
-          <div class="progress ${q.state === "active" ? "ongoing" : ""}"><i style="width:${q.state === "done" ? 100 : q.state === "locked" ? 0 : 100}%"></i></div>
+          <h3>${esc(q.title)}</h3>
+          <p class="where">${esc(q.where)}</p>
+          <div class="progress ${q.state === "active" ? "ongoing" : ""}" aria-hidden="true"><i style="width:${q.state === "locked" ? 0 : 100}%"></i></div>
           <h4>Objectives</h4>
-          <ul class="obj">${q.objectives.map((o) => `<li>${o}</li>`).join("")}</ul>
+          <ul class="obj">${q.objectives.map((o) => `<li>${esc(o)}</li>`).join("")}</ul>
         </div>
         <div>
           <h4>Rewards</h4>
-          <ul class="rew">${q.rewards.map((r) => `<li>${r}</li>`).join("")}</ul>
+          <ul class="rew">${q.rewards.map((r) => `<li>${esc(r)}</li>`).join("")}</ul>
         </div>`;
     }
     quests.forEach((q, i) => {
@@ -854,158 +1600,54 @@
       g.setAttribute("class", "node " + q.state);
       g.setAttribute("tabindex", "0");
       g.setAttribute("role", "button");
-      g.setAttribute("aria-label", `${q.label}: ${q.title}`);
+      g.setAttribute("aria-label", `${q.label}: ${q.title}, ${{ done: "complete", active: "in progress", locked: "locked" }[q.state]}`);
+      const above = q.y > 120;
       g.innerHTML = `
+        ${q.state === "active" ? `<rect class="halo" x="${q.x - 16}" y="${q.y - 16}" width="32" height="32" rx="3"/>` : ""}
         <rect class="ring" x="${q.x - 26}" y="${q.y - 26}" width="52" height="52" transform="rotate(45 ${q.x} ${q.y})" rx="4"/>
         <rect class="gem" x="${q.x - 16}" y="${q.y - 16}" width="32" height="32" transform="rotate(45 ${q.x} ${q.y})" rx="3"/>
-        <text x="${q.x}" y="${q.y + (q.y > 120 ? -62 : 56)}" text-anchor="middle">${q.label}</text>
-        <text class="sub" x="${q.x}" y="${q.y + (q.y > 120 ? -44 : 74)}" text-anchor="middle">${q.sub}</text>`;
+        <text x="${q.x}" y="${q.y + (above ? -62 : 56)}" text-anchor="middle">${q.label}</text>
+        <text class="sub" x="${q.x}" y="${q.y + (above ? -44 : 74)}" text-anchor="middle">${q.sub}</text>`;
       g.addEventListener("click", () => showQuest(i));
-      g.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); showQuest(i); } });
+      g.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); showQuest(i); }
+        if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+          e.preventDefault();
+          const nodes = map.querySelectorAll(".node");
+          nodes[(i + (e.key === "ArrowRight" ? 1 : nodes.length - 1)) % nodes.length].focus();
+        }
+      });
       map.appendChild(g);
     });
     showQuest(2);
 
-    /* ================= Disk drive ================= */
-    const disks = [
-      {
-        name: "Complaint Resolution AI", short: "COMPLAINT AI", tag: "DISK 1 · PY", color: "c1",
-        blurb: "A typed, multi-agent pipeline that turns a consumer grievance into a case analysis, negotiation strategy, complaint draft and escalation plan.",
-        diagram: [
-          "  grievance.txt",
-          "        |",
-          "  +-----v------+",
-          "  |   intake   |--> pydantic models",
-          "  +-----+------+",
-          "        |",
-          "  +-----v------+    +------------+",
-          "  |  analysis  |--->|  strategy  |",
-          "  +-----+------+    +-----+------+",
-          "        |                 |",
-          "  +-----v------+    +-----v------+",
-          "  |   draft    |    |  escalate  |",
-          "  +------------+    +------------+",
-        ],
-        stack: "PYTHON · PYDANTIC · FASTAPI · STREAMLIT",
-        extra: "74 AUTOMATED TESTS · OFFLINE FALLBACKS",
-        links: [["SOURCE", "https://github.com/joncorbin/cr-ai-project"]],
-      },
-      {
-        name: "Here & Now", short: "HERE & NOW", tag: "DISK 2 · TS", color: "c2",
-        blurb: "Free things happening near you, right now. Sign in, share your location, and see nearby events from users and Ticketmaster.",
-        diagram: [
-          "   you (lat, lng)",
-          "        |",
-          "  +-----v------+   +---------+",
-          "  |  next.js   |<--|  clerk  |",
-          "  +--+-------+-+   +---------+",
-          "     |       |",
-          " +---v----+ +v-------------+",
-          " | postgis| | ticketmaster |",
-          " | radius | |     api      |",
-          " +---+----+ +------+-------+",
-          "     |             |",
-          "     +------+------+",
-          "            |",
-          "     events near you",
-        ],
-        stack: "NEXT.JS · POSTGIS · CLERK · TICKETMASTER API",
-        extra: "USER-SUBMITTED EVENTS · GEOSPATIAL SEARCH",
-        links: [["SOURCE", "https://github.com/joncorbin/hereandnow"], ["LIVE DEMO", "https://hereandnow-delta.vercel.app"]],
-      },
-      {
-        name: "AidChain", short: "AIDCHAIN", tag: "DISK 3 · HACK", color: "c3",
-        blurb: "A humanitarian donation-tracking prototype from the EasyA × Algorand Hackathon (Sep 2025). I built the React/TypeScript frontend.",
-        diagram: [
-          "  donor wallet",
-          "       |  donate",
-          "  +----v-------+",
-          "  |  campaign  |",
-          "  +----+-------+",
-          "       |  issue",
-          "  +----v-------+",
-          "  | aid voucher|---> tracked on",
-          "  +----+-------+      algorand",
-          "       |  redeem",
-          "   recipient",
-        ],
-        stack: "REACT · TYPESCRIPT · TAILWIND · ALGORAND",
-        extra: "FIGMA → LANDING PAGE · DASHBOARD AGGREGATION",
-        links: [],
-      },
-    ];
-    const diskList = $("disk-list");
-    const driveOut = $("drive-out");
-    const drive = $("drive");
-    let loadToken = 0;
-
-    function driveLine(text, cls) {
-      const d = document.createElement("div");
-      d.className = "term-line" + (cls ? " " + cls : "");
-      d.textContent = text;
-      driveOut.appendChild(d);
-      driveOut.scrollTop = driveOut.scrollHeight;
-      return d;
+    /* ================= Reveal + count-up ================= */
+    function countUp(el) {
+      const target = Number(el.dataset.count);
+      const pre = el.dataset.prefix || "", suf = el.dataset.suffix || "";
+      const fmt = (n) => pre + Math.round(n).toLocaleString("en-US") + suf;
+      if (reduceMotion) { el.textContent = fmt(target); return; }
+      el.setAttribute("aria-label", fmt(target));
+      const t0 = performance.now(), dur = 1400;
+      (function frame(t) {
+        const p = Math.min(1, (t - t0) / dur);
+        el.textContent = fmt(target * (1 - Math.pow(1 - p, 3)));
+        if (p < 1) requestAnimationFrame(frame);
+      })(t0);
     }
-    async function loadDisk(i, btn) {
-      const token = ++loadToken;
-      const d = disks[i];
-      diskList.querySelectorAll(".disk").forEach((b) => { b.classList.remove("inserted"); b.setAttribute("aria-pressed", "false"); });
-      btn.classList.add("inserted");
-      btn.setAttribute("aria-pressed", "true");
-      drive.classList.add("busy");
-      driveOut.innerHTML = "";
-      driveLine("]RUN " + d.short.replace(/\s/g, "") + ".BAS", "dim");
-      driveLine("READING DISK...", "dim");
-      await sleep(450);
-      if (token !== loadToken) return;
-      drive.classList.remove("busy");
-      driveOut.innerHTML = "";
-      driveLine(d.name.toUpperCase());
-      driveLine(d.blurb, "dim");
-      driveLine("");
-      const pre = document.createElement("pre");
-      driveOut.appendChild(pre);
-      for (const l of d.diagram) {
-        if (token !== loadToken) return;
-        pre.textContent += l + "\n";
-        driveOut.scrollTop = driveOut.scrollHeight;
-        await sleep(45);
-      }
-      driveLine("");
-      driveLine(d.stack);
-      driveLine(d.extra, "dim");
-      if (d.links.length) {
-        const row = document.createElement("div");
-        row.className = "term-line";
-        d.links.forEach(([label, href], j) => {
-          const a = document.createElement("a");
-          a.href = href;
-          a.textContent = "[" + label + "]";
-          if (j) row.append("  ");
-          row.appendChild(a);
-        });
-        driveOut.appendChild(row);
-      } else {
-        driveLine("HACKATHON BUILD · NO PUBLIC SOURCE", "dim");
-      }
-    }
-    disks.forEach((d, i) => {
-      const b = document.createElement("button");
-      b.className = "disk " + d.color;
-      b.setAttribute("aria-pressed", "false");
-      b.setAttribute("aria-label", "Load " + d.name);
-      b.innerHTML = `<span class="label"><small>${d.tag}</small><b>${d.short}</b></span>`;
-      b.addEventListener("click", () => loadDisk(i, b));
-      diskList.appendChild(b);
-    });
-    driveLine("DRIVE 1 READY.", "dim");
-    driveLine("");
-    driveLine("NO DISK INSERTED.");
-    driveLine("PICK ONE FROM THE LIBRARY.", "dim");
+    document.querySelectorAll(".score").forEach((el, i) => el.style.setProperty("--d", i * 0.08 + "s"));
+    const revealIO = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        e.target.classList.add("in");
+        e.target.querySelectorAll("[data-count]").forEach(countUp);
+        revealIO.unobserve(e.target);
+      });
+    }, { threshold: 0.15, rootMargin: "0px 0px -40px 0px" });
+    document.querySelectorAll("[data-reveal]").forEach((el) => revealIO.observe(el));
 
     /* ================= Keycap tray (physics) ================= */
-    const skills = ["Python", "Java", "TypeScript", "C++", "React", "FastAPI", "Pydantic", "Streamlit", "JavaFX", "Okta", "Google Workspace", "Jamf", "Apple Business Manager", "Arduino", "MATLAB", "SolidWorks", "Linear API"];
+    const skills = ["Python", "TypeScript", "Java", "C++", "React", "Next.js", "FastAPI", "Pydantic", "Streamlit", "PostGIS", "JavaFX", "Linear API", "Apps Script", "Okta", "Google Workspace", "Jamf", "Apple Business Manager", "Arduino", "MATLAB", "SolidWorks"];
     $("skill-list").textContent = "Skills: " + skills.join(", ") + ".";
     const keyStyles = [
       { top: "#f1e9d6", side: "#c7b996", text: "#2a231b" },
@@ -1033,7 +1675,6 @@
       const canvas = $("tray-canvas");
       const ctx = canvas.getContext("2d");
       const engine = Engine.create();
-      engine.gravity.y = 1;
       let W = 0, H = 0, walls = [];
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       const FONT = '500 14px "IBM Plex Mono", monospace';
@@ -1054,7 +1695,6 @@
           Bodies.rectangle(W / 2, -2000, W * 3, t, { isStatic: true }),
         ];
         Composite.add(engine.world, walls);
-        // Pull back anything a resize left outside.
         Composite.allBodies(engine.world).forEach((b) => {
           if (b.isStatic) return;
           if (b.position.x > W - 20 || b.position.y > H - 10) Body.setPosition(b, { x: Math.min(b.position.x, W - 60), y: 40 });
@@ -1063,13 +1703,12 @@
       size();
       window.addEventListener("resize", size);
 
-      ctx.font = FONT;
       const small = W < 500;
       skills.forEach((s, i) => {
         ctx.font = FONT;
         const w = ctx.measureText(s).width + (small ? 22 : 30);
         const h = small ? 36 : 42;
-        const b = Bodies.rectangle(40 + Math.random() * Math.max(60, W - 80), -60 - i * 50, w, h, {
+        const b = Bodies.rectangle(40 + Math.random() * Math.max(60, W - 80), -60 - i * 45, w, h, {
           chamfer: { radius: 8 }, restitution: 0.35, friction: 0.4, density: 0.002,
         });
         b.plugin = { kind: "key", label: s, w, h, style: keyStyles[i % keyStyles.length] };
@@ -1077,6 +1716,7 @@
         Composite.add(engine.world, b);
       });
 
+      const engrams = [];
       function dropEngram(forced) {
         const tier = forced || rollRarity();
         const r = small ? 21 : 26;
@@ -1085,14 +1725,28 @@
         b.plugin = { kind: "engram", tier, r };
         Body.setAngularVelocity(b, (Math.random() - 0.5) * 0.4);
         Composite.add(engine.world, b);
+        engrams.push(b);
+        beep(520, 0.08, 0.03, "triangle");
+      }
+      function decrypt(b) {
+        Composite.remove(engine.world, b);
+        engrams.splice(engrams.indexOf(b), 1);
+        const t = b.plugin.tier;
+        toast(t.name + " engram decrypted", t.facts[Math.floor(Math.random() * t.facts.length)], t.color);
+        beep(880, 0.08, 0.04, "sine"); setTimeout(() => beep(1320, 0.14, 0.04, "sine"), 90);
       }
       window.__dropEngram = dropEngram;
       window.__exotic = () => dropEngram(rarities[4]);
       $("drop-engram").addEventListener("click", () => dropEngram());
+      $("decrypt-engram").addEventListener("click", () => {
+        if (engrams.length) decrypt(engrams[engrams.length - 1]);
+        else toast("No engrams", "Drop one first.", "#e9e6dc");
+      });
       $("shake").addEventListener("click", () => {
         Composite.allBodies(engine.world).forEach((b) => {
           if (!b.isStatic) Body.setVelocity(b, { x: (Math.random() - 0.5) * 18, y: -10 - Math.random() * 12 });
         });
+        beep(140, 0.2, 0.05, "sawtooth");
       });
       setTimeout(() => dropEngram(rarities[3]), 1800);
 
@@ -1132,11 +1786,7 @@
         const moved = Math.hypot(e.mouse.position.x - downAt.x, e.mouse.position.y - downAt.y);
         const b = downAt.body;
         downAt = null;
-        if (moved < 6 && b && b.plugin && b.plugin.kind === "engram") {
-          Composite.remove(engine.world, b);
-          const t = b.plugin.tier;
-          toast(t.name + " engram decrypted", t.facts[Math.floor(Math.random() * t.facts.length)], t.color);
-        }
+        if (moved < 6 && b && b.plugin && b.plugin.kind === "engram") decrypt(b);
       });
 
       function roundRect(x, y, w, h, r) {
@@ -1165,14 +1815,12 @@
           return { x: Math.cos(a) * R, y: Math.sin(a) * R, a };
         });
         const inner = Array.from({ length: 5 }, (_, i) => ({ x: outer[2 * i].x / PHI, y: outer[2 * i].y / PHI }));
-
         ctx.shadowColor = tier.color;
         ctx.shadowBlur = 18;
         ctx.fillStyle = tier.color;
         polyPath(outer);
         ctx.fill();
         ctx.shadowBlur = 0;
-
         ctx.lineJoin = "round";
         ctx.lineWidth = 1.2;
         for (let i = 0; i < 5; i++) {
@@ -1190,7 +1838,6 @@
         ctx.strokeStyle = "rgba(255,255,255,0.7)";
         ctx.stroke();
       }
-
       function draw() {
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         ctx.clearRect(0, 0, W, H);
@@ -1236,18 +1883,27 @@
     }, { threshold: 0.2 });
     trayObserver.observe($("tray"));
 
-    /* ================= Konami code ================= */
-    const konami = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
-    let kIdx = 0;
+    /* ================= Secret phrases ================= */
+    // Type a Destiny motto anywhere on the page (or into the terminal) for an exotic.
+    const phrases = ["peraudaciaadastra", "peradaciaatastra", "peraudaciaatastra", "peradaciaadastra", "guardiansmaketheirownfate"];
+    let typed = "";
+    function unlockExotic() {
+      typed = "";
+      commands.color.run();
+      if (window.__exotic) window.__exotic();
+      toast("Exotic unlocked", "Per audacia ad astra. The phosphor shifted, and an exotic engram dropped in the skills tray.", "#e8b23a");
+      [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => beep(f, 0.12, 0.05, "triangle"), i * 110));
+    }
+    function checkPhrase(text) {
+      const norm = text.toLowerCase().replace(/[^a-z]/g, "");
+      if (phrases.some((p) => norm.endsWith(p))) { print("ACCESS GRANTED.", "inv"); unlockExotic(); return true; }
+      return false;
+    }
     window.addEventListener("keydown", (e) => {
-      const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
-      kIdx = k === konami[kIdx] ? kIdx + 1 : (k === konami[0] ? 1 : 0);
-      if (kIdx === konami.length) {
-        kIdx = 0;
-        commands.color();
-        if (window.__exotic) window.__exotic();
-        toast("Cheat code accepted", "Phosphor changed. An exotic engram dropped in the skills tray.", "#e8b23a");
-      }
+      if (e.target === input || game || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key.length !== 1 || !/[a-z]/i.test(e.key)) return;
+      typed = (typed + e.key.toLowerCase()).slice(-40);
+      if (phrases.some((p) => typed.endsWith(p))) unlockExotic();
     });
   })();
   </script>
